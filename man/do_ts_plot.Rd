@@ -27,6 +27,7 @@ do_ts_plot(gr_obj, choice, data_choice, filter = NA, main = "Timeseries",
 \item{date_axis}{Date format for axis}
 }
 \description{
-Plot timeseries groups of grouping object.
+Though a grouping object can be converted to more sophisticated time series data and then plotted,
+it can be convenient to go directly from a grouping object to a time series plot. This function provides that capability.
 }
 
