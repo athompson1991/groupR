@@ -46,8 +46,8 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
       temp_groups <- as.vector(col)
       temp_ls <- lapply(functions, function(f){
         temp_fn <- df %>%
-          group_by_(.dots = temp_groups) %>%
-          summarize_(lazyeval::interp(f))
+          dplyr::group_by_(.dots = temp_groups) %>%
+          dplyr::summarize_(lazyeval::interp(f))
         temp_fn
       })
       temp_out <- do.call(cbind, temp_ls)
