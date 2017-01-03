@@ -23,6 +23,7 @@ get_combinations <- function(n, char_vec){
 #' For example, if there are two groups, A and B, four data frames are returned: data frames for A, B, both A and B, and a data frame summarizing the whole dataset.
 #'
 #'
+#' @export
 #' @param df A data frame of raw data.
 #' @param groups A character vector of column names in df that will be basis for aggregation.
 #' @param functions A named list of functions for aggregation.
@@ -38,9 +39,9 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
   n_fn <- length(functions)
   col_names <- names(functions)
   functions <- as.vector(sapply(col_names, function(f) functions[[f]]))
-  
+
   out_list <- lapply(group_combn, function(mtx){
-    
+
     temp_df <- apply(mtx, 2, function(col){
       temp_groups <- as.vector(col)
       temp_ls <- lapply(functions, function(f){
@@ -51,12 +52,12 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
       })
       temp_out <- do.call(cbind, temp_ls)
     })
-    
+
     comb_names <- apply(mtx, 2, function(col) paste(col, collapse = "/"))
     names(temp_df) <- comb_names
     temp_df
   })
-  
+
   ls_nm <- paste("n_", 1:length(groups), "_group", sep = "")
   names(out_list) <- ls_nm
   out_list <- lapply(out_list, function(ls){
@@ -70,9 +71,10 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
 
 #' Perform function(s) on grouping object.
 #'
+#' @export
 #' @param gr_obj A grouping object created with the \code{get_groups} function
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
-#' @is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{gr_obj})
+#' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{gr_obj})
 #'
 group_obj_apply <- function(gr_obj, new_functions, is_cbind = F){
   raw_names <- names(new_functions)
@@ -109,7 +111,7 @@ group_obj_apply <- function(gr_obj, new_functions, is_cbind = F){
 #'
 #' Though a grouping object can be converted to more sophisticated time series data and then plotted,
 #' it can be convenient to go directly from a grouping object to a time series plot. This function provides that capability.
-#' 
+#'
 #' @param gr_obj Grouping object created with \code{get_groups}
 #' @param choice Grouping choices from grouping object
 #' @param data_choice Calculated column to be plotted (created with the function argument in \code{get_groups})
@@ -166,7 +168,8 @@ do_ts_plot <- function(gr_obj, choice, data_choice, filter = NA, main = "Timeser
 }
 
 #' Write grouping object to csv files.
-#
+#'
+#' @export
 #' @param grouping_obj Grouping object made with \code{get_groups}
 #' @param path Out directory for files
 #' @return
@@ -187,6 +190,7 @@ write_grouping_files <- function(grouping_obj, path){
 
 #' Extracts time series data from grouping object.
 #'
+#' @export
 #' @param grouping_obj Grouping object created with \code{get_groups}
 #' @param groups Groups that will be converted to time series data (\code{xts} object)
 #' @param value_choice The column which will has values that will be in time series. Function applied will be \code{sum} but each value should be unique.
@@ -201,7 +205,7 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_col = "dd_dt"){
     x <- Filter(Negate(is.NullOb), x)
     lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
   }
-  
+
   main_ls <- lapply(grouping_obj[-length(grouping_obj)], function(x){
     lapply(x, function(y){
       c_nms <- colnames(y)
@@ -221,7 +225,7 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_col = "dd_dt"){
       }
     })
   })
- 
+
   main_ls <- rmNullObs(main_ls)
   main_ls <- main_ls[1:length(groups)]
   main_ls
@@ -243,7 +247,7 @@ do_modeling <- function(z_data, is_auto_arima = F, ...){
   z_yr    <- year(first(z_ind))
   z_mth   <- month(first(z_ind))
   ts_data <- ts(z_data, frequency = 12, start = c(z_yr, z_mth))
-  
+
   if(is_auto_arima){
     temp_model <- forecast::auto.arima(ts_data)
   }else{
@@ -254,6 +258,7 @@ do_modeling <- function(z_data, is_auto_arima = F, ...){
 
 #' Models time series list with an ARIMA model.
 #'
+#' @export
 #' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
 #' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
 #' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
@@ -280,7 +285,7 @@ get_forecast_stats <- function(forecast_ls, original_ls, date_type = "months"){
 
         temp_xts <- original_ls[[i]][[j]][ ,k]
         original_dates <- as.Date(index(temp_xts))
-        previous_dates <- last(original_dates, length(temp_mean)) 
+        previous_dates <- last(original_dates, length(temp_mean))
         previous_obs   <- temp_xts[previous_dates]
 
         last_date <- last(original_dates)
@@ -289,7 +294,7 @@ get_forecast_stats <- function(forecast_ls, original_ls, date_type = "months"){
         }
 
         out_df <- data.frame(row.names= 1:length(temp_mean), previous_dates, previous_obs, next_dates, temp_mean, temp_upper, temp_lower)
-        colnames(out_df) <- c("last_dates", "last_values", "next_dates", "point_fcst", "upper95", "upper80", "lower95", "lower80") 
+        colnames(out_df) <- c("last_dates", "last_values", "next_dates", "point_fcst", "upper95", "upper80", "lower95", "lower80")
         df_ls[[k]] <- out_df
         names(df_ls)[k] <- colnames(original_ls[[i]][[j]])[k]
       }
@@ -307,9 +312,9 @@ custom_forecast_plot <- function(fcst_obj){
   lower <- fcst_obj$lower
 
   colnames(upper) <- gsub("\\%", "", colnames(upper))
-  colnames(upper) <- paste("upper",colnames(upper), sep = "_")  
+  colnames(upper) <- paste("upper",colnames(upper), sep = "_")
   colnames(lower) <- gsub("\\%", "", colnames(lower))
-  colnames(lower) <- paste("lower",colnames(lower), sep = "_")  
+  colnames(lower) <- paste("lower",colnames(lower), sep = "_")
 
   new_data <- fcst_obj$mean
   old_data <- fcst_obj$x
