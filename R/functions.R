@@ -72,6 +72,7 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
 #' Perform function(s) on grouping object.
 #'
 #' @export
+#' @importFrom magrittr "%>%"
 #' @param gr_obj A grouping object created with the \code{get_groups} function
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
 #' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{gr_obj})
