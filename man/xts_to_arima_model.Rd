@@ -16,4 +16,3 @@ xts_to_arima_model(xts_gr_obj, ..., is_auto_arima)
 \description{
 Models time series list with an ARIMA model.
 }
-

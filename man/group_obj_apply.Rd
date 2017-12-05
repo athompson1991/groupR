@@ -16,4 +16,3 @@ group_obj_apply(gr_obj, new_functions, is_cbind = F)
 \description{
 Perform function(s) on grouping object.
 }
-

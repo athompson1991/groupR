@@ -21,4 +21,3 @@ An \code{xts} object with the date column cast against the groups column, using 
 \description{
 Extracts time series data from grouping object.
 }
-

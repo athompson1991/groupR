@@ -125,7 +125,6 @@ group_obj_apply <- function(gr_obj, new_functions, is_cbind = F){
 #'
 do_ts_plot <- function(gr_obj, choice, data_choice, filter = NA, main = "Timeseries", date_col = "dd_dt", window = NA, ..., date_axis = "%b-%Y"){
 
-
   choice_addition <- paste(choice, collapse = " + ")
   n = length(choice) + 1
   choice = c(date_col, choice)

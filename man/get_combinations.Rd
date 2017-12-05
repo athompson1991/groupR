@@ -21,4 +21,3 @@ Make every combination of character vector
 x <- c("foo", "bar", "baz", "potato")
 y <- get_combinations(3, x)
 }
-

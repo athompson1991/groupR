@@ -17,4 +17,3 @@ write_grouping_files(grouping_obj, path)
 \description{
 Write grouping object to csv files.
 }
-
