@@ -1,6 +1,6 @@
 # groupR
 
-[![Build Status](https://travis-ci.org/athompson1991/AlphaVantageClient.svg?branch=master)](https://travis-ci.org/athompson1991/groupR)
+[![Build Status](https://travis-ci.org/athompson1991/groupR.svg?branch=master)](https://travis-ci.org/athompson1991/groupR)
 
 ## Introduction
 
