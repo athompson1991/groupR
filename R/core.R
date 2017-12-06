@@ -1,6 +1,3 @@
-library(dplyr)
-library(ggplot2)
-
 #' Create grouping object.
 #'
 #' This function takes a data frame as input and returns a grouping object as output. The grouping object is a list of lists of data frames, one data frame for every possible combination of groups.
@@ -37,7 +34,7 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
       temp_out <- do.call(cbind, temp_ls)
     })
 
-    comb_names <- apply(mtx, 2, function(col) paste(col, collapse = "/"))
+    comb_names <- apply(mtx, 2, function(col) paste(col, collapse = "..."))
     names(temp_df) <- comb_names
     temp_df
   })
