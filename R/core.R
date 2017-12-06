@@ -32,6 +32,8 @@ get_groups <- function(df, groups, functions = list("count" = "n()")){
         temp_fn
       })
       temp_out <- do.call(cbind, temp_ls)
+      temp_out <- dplyr::grouped_df(temp_out, temp_groups)
+      return(temp_out)
     })
 
     comb_names <- apply(mtx, 2, function(col) paste(col, collapse = "..."))
