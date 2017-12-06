@@ -14,7 +14,7 @@
 #'                            , my_group2 = c(rep("foo", 2), rep("bar", 2), rep("baz", 2), rep("potato", 2))
 #'                            , my_data = runif(n = 8)
 #'                           )
-#' grouping_obj <- get_groups(df = default_data, groups = "my_group", functions = list(rando_sum = "sum(my_data)"))
+#' grouping_obj <- get_groups(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
 get_groups <- function(df, groups, functions = list("count" = "n()")){
   group_combn <- get_combinations(length(groups), groups)
   n_fn <- length(functions)

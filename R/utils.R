@@ -3,9 +3,6 @@
 #' @param n Maximum rows per combination data frame
 #' @param char_vec Character vector to be used
 #' @return A list of data frames with every column a unique combination of the given character vector
-#' @examples
-#' x <- c("foo", "bar", "baz", "potato")
-#' y <- get_combinations(3, x)
 get_combinations <- function(n, char_vec){
   full_list <- list()
   for(i in 1:n){
