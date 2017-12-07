@@ -1,14 +1,11 @@
 context("Core")
 
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
-simple_function <- function(df) df$avg_salary / df$max_salary
-
 grouping_obj <- get_groups(
   df = main_df,
   groups = c("company", "party", "color"),
   functions = function_list
 )
-
 
 test_that("get_groups returns proper list", {
   expect_equal(names(grouping_obj), c("n_1_group", "n_2_group", "n_3_group"))

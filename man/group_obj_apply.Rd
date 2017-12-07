@@ -4,14 +4,14 @@
 \alias{group_obj_apply}
 \title{Perform function(s) on grouping object.}
 \usage{
-group_obj_apply(gr_obj, new_functions, is_cbind = F)
+group_obj_apply(group_obj, new_functions, is_cbind = F)
 }
 \arguments{
-\item{gr_obj}{A grouping object created with the \code{get_groups} function}
+\item{group_obj}{A grouping object created with the \code{get_groups} function}
 
 \item{new_functions}{A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.}
 
-\item{is_cbind}{Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{gr_obj})}
+\item{is_cbind}{Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})}
 }
 \description{
 Perform function(s) on grouping object.
