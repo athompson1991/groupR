@@ -4,7 +4,8 @@
 \alias{get_groups}
 \title{Create grouping object.}
 \usage{
-get_groups(df, groups, functions = list(count = "n()"))
+get_groups(df, groups, functions = list(count = "n()"),
+  depth = length(groups))
 }
 \arguments{
 \item{df}{A data frame of raw data.}

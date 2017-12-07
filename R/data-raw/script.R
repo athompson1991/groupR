@@ -6,12 +6,7 @@ salary <- c(100,70,80,80,60,100,120,80)
 
 main_df <- data.frame(name, company, party, color, salary)
 
-grouping_obj <- get_groups(
-  df = main_df,
-  groups = c("company", "party", "color"),
-  functions = list(avg_salary = "mean(salary)")
-)
-
 devtools::use_data(main_df, grouping_obj, internal = T, overwrite = T)
 
 rm(list = ls())
+
