@@ -58,36 +58,38 @@ get_groups <- function(df, groups, functions = list("count" = "n()"), depth = le
 #'
 #' @export
 #' @importFrom magrittr "%>%"
-#' @param gr_obj A grouping object created with the \code{get_groups} function
+#' @param group_obj A grouping object created with the \code{get_groups} function
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
-#' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{gr_obj})
+#' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})
 #'
-group_obj_apply <- function(gr_obj, new_functions, is_cbind = F){
+group_obj_apply <- function(group_obj, new_functions, is_cbind = F){
   raw_names <- names(new_functions)
-  lapply(gr_obj, function(x){
-    lapply(x, function(y){
-      if(!is.null(ncol(y))){
-        i = 1
+  lapply(group_obj, function(df_list){
+    lapply(df_list, function(df){
+      if(!is.null(ncol(df))){
         new_data_ls <- lapply(new_functions, function(f){
-          temp_data <- do.call(f, list(y))
-          if(is.xts(temp_data) | is.data.frame(temp_data)){
+          temp_data <- do.call(f, list(df))
+          if(xts::is.xts(temp_data) | is.data.frame(temp_data)){
             colnames(temp_data) <- paste(raw_names[i], colnames(temp_data), sep = "_")
           }
-          i = i + 1
-          temp_data
+          return(temp_data)
         })
+
+        return_this <- NULL
         if(is_cbind){
-          if(is.xts(y)){
+          if(xts::is.xts(df)){
             new_data <- do.call(merge, new_data_ls)
             y <- merge(y, new_data)
           }else{
             new_data <- do.call(cbind, new_data_ls)
-            y <- cbind(y, new_data)
+            df <- cbind(as.data.frame(df), as.data.frame(new_data))
           }
-          return(y)
+          return_this <- df
         }else{
-          new_data_ls
+          return_this <- new_data_ls
         }
+
+        return(return_this)
       }
     })
   })
