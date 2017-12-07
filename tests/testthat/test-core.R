@@ -1,6 +1,7 @@
 context("Core")
 
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
+
 grouping_obj <- get_groups(
   df = main_df,
   groups = c("company", "party", "color"),
@@ -32,6 +33,7 @@ test_that("group object does calculation correctly", {
 })
 
 test_that("group apply produces expected structure", {
+  simple_function <- function(df) df$avg_salary / df$max_salary
   new_functions <- list(percent_calc = simple_function)
   applied_obj <- group_obj_apply(grouping_obj, new_functions = new_functions, is_cbind = T)
   expect_equal(names(applied_obj$n_1_group$company), c("company", "avg_salary", "max_salary", "percent_calc"))
