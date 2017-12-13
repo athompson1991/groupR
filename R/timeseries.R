@@ -8,37 +8,35 @@
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
 extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt"){
-
-  # From StackOverflow: http://stackoverflow.com/questions/26539441
-  is.NullOb <- function(x) is.null(x) | all(sapply(x, is.null))
-  rmNullObs <- function(x) {
-    x <- Filter(Negate(is.NullOb), x)
-    lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
-  }
-
   out_list <- lapply(grouping_obj[-length(grouping_obj)], function(grouping_level){
-    lapply(grouping_level, function(df){
+    xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
+      return_xts <- NULL
       if(date_column %in% column_names){
         groups_subset <- column_names[column_names %in% groups]
         if(length(groups_subset) > 0){
           casting_formula <- as.formula(paste(date_column, "~", paste(groups_subset, collapse = "+")))
           casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
           date_index <- which(colnames(casted_df) == date_column)
-          xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
+          return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
+          colnames(return_xts) <- new_xts_names(df, groups_subset)
         }else{
           date_index <- which(colnames(df) == date_column)
-          xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
+          return_xts <- xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
         }
       }else{
-        NULL
+        return_xts <- NULL
       }
+      return(return_xts)
     })
+    names(xts_list) <- gsub(names(xts_list), pattern = "*\\.\\.\\.dates", replacement="")
+    return(xts_list)
   })
 
   out_list <- rmNullObs(out_list)
   out_list <- out_list[1:length(groups)]
-  out_list
+  names(out_list$n_1_group) <- "overall"
+  return(out_list)
 }
 
 get_forecast_stats <- function(forecast_ls, original_ls, date_type = "months"){

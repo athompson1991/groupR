@@ -25,12 +25,7 @@ get_groups <- function(df, groups, functions = list("count" = "n()"), depth = le
 
     df <- apply(mtx, 2, function(column){
       group_selection <- as.vector(column)
-      dplyr_list <- lapply(functions, function(f){
-        temp_fn <- df %>%
-          dplyr::group_by_(.dots = group_selection) %>%
-          dplyr::summarize_(lazyeval::interp(f))
-        temp_fn
-      })
+      dplyr_list <- dplyr_loop(in_df = df, functions = functions, selection = group_selection)
       groups_columns <- as.data.frame(dplyr_list[[1]][ ,1:length(group_selection)])
       dplyr_list <- lapply(dplyr_list, function(df) df[ ,-c(1:length(group_selection))])
       out_df <- do.call(cbind, dplyr_list)
@@ -39,13 +34,21 @@ get_groups <- function(df, groups, functions = list("count" = "n()"), depth = le
       colnames(out_df)[tail(1:ncol(out_df), function_count)] <- column_names
       return(out_df)
     })
-    comb_names <- apply(mtx, 2, function(column) paste(column, collapse = "..."))
-    names(df) <- comb_names
+    names(df) <- apply(mtx, 2, function(column) paste(column, collapse = "..."))
     df
   })
 
   names(out_list) <- paste("n_", 1:depth, "_group", sep = "")
   return(out_list)
+}
+
+dplyr_loop <- function(in_df, functions, selection){
+  lapply(functions, function(f){
+    out_df <- in_df %>%
+      dplyr::group_by_(.dots = selection) %>%
+      dplyr::summarize_(lazyeval::interp(f))
+    out_df
+  })
 }
 
 #' Perform function(s) on grouping object.

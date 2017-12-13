@@ -4,14 +4,14 @@
 \alias{extract_xts}
 \title{Extracts time series data from grouping object.}
 \usage{
-extract_xts(grouping_obj, groups, value_choice, date_col = "dd_dt")
+extract_xts(grouping_obj, groups, value_choice, date_column = "dd_dt")
 }
 \arguments{
 \item{grouping_obj}{Grouping object created with \code{get_groups}}
 
 \item{groups}{Groups that will be converted to time series data (\code{xts} object)}
 
-\item{value_choice}{The column which will has values that will be in time series. Function applied will be \code{sum} but each value should be unique.}
+\item{value_choice}{The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.}
 
 \item{date_col}{The column with date data which will represent unique index for the returned \code{xts}}
 }
