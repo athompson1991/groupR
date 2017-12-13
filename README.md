@@ -1,7 +1,8 @@
 # groupR
 
 [![Build Status](https://travis-ci.org/athompson1991/groupR.svg?branch=master)](https://travis-ci.org/athompson1991/groupR)
-
+[![codecov.io](https://codecov.io/github/athompson1991/groupR/coverage.svg?branch=master)](https://codecov.io/github/athompson1991/groupR?branch=master)
+[![Dependency Status](https://dependencyci.com/github/athompson1991/groupR/badge)](https://dependencyci.com/github/athompson1991/groupR)
 ## Introduction
 
 The code in this pseudo-package is used to conduct comprehensive analysis on somewhat abstract datasets. For example, suppose you have this:
