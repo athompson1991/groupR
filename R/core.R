@@ -39,7 +39,8 @@ get_groups <- function(df, groups, functions = list("count" = "n()"), depth = le
   })
 
   names(out_list) <- paste("n_", 1:depth, "_group", sep = "")
-  return(out_list)
+  out <- structure(out_list, class="groupr")
+  return(out)
 }
 
 dplyr_loop <- function(in_df, functions, selection){

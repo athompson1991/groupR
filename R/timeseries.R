@@ -196,15 +196,3 @@ do_ts_plot <- function(gr_obj, choice, data_choice, filter = NA, main = "Timeser
 
   plot(as.zoo(xts_obj), plot.type = "multiple", main = main, panel = my_panel, temp_names = colnames(xts_obj), ylab = NA, xlab = NA, las = 2, ..., xaxt = "n", yaxt = "n")
 }
-
-
-get_forecasts <- function(model_ls){
-  lapply(model_ls, function(i){
-    lapply(i, function(j){
-      temp_group <- j[["mdl"]]
-      lapply(temp_group, function(k){
-        forecast(k)
-      })
-    })
-  })
-}

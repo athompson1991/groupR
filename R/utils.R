@@ -48,3 +48,30 @@ new_xts_names <- function(obs, groups){
   new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
   return(new_col_names)
 }
+
+print.groupr <- function(groupr_obj, include_colnames = F){
+  groups <- names(groupr_obj$n_1_group)
+
+  indent <- "  "
+  tree_stem <- "|_"
+  newline <- "\n"
+  for(grouping_level in names(groupr_obj)){
+    cat(grouping_level)
+    cat(newline)
+    for(df_name in names(groupr_obj[[grouping_level]])){
+      cat(indent)
+      cat(tree_stem)
+      cat(df_name)
+      if(include_colnames) {
+        for(col in colnames(groupr_obj[[grouping_level]][[df_name]])){
+          cat(newline)
+          cat(indent)
+          cat(indent)
+          cat(tree_stem)
+          cat(col)
+        }
+      }
+      cat(newline)
+    }
+  }
+}
