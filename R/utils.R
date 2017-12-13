@@ -50,6 +50,8 @@ new_xts_names <- function(obs, groups){
   return(new_col_names)
 }
 
+as.groupr <- function(in_list) structure(in_list, class="groupr")
+
 print.groupr <- function(groupr_obj, include_colnames = F){
   groups <- names(groupr_obj$n_1_group)
 
@@ -76,3 +78,4 @@ print.groupr <- function(groupr_obj, include_colnames = F){
     }
   }
 }
+
