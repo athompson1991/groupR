@@ -16,20 +16,20 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt
     lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
   }
 
-  main_ls <- lapply(grouping_obj[-length(grouping_obj)], function(x){
-    lapply(x, function(y){
-      c_nms <- colnames(y)
-      if(date_column %in% c_nms){
-        temp_groups <- c_nms[c_nms %in% groups]
-        if(length(temp_groups) > 0){
+  out_list <- lapply(grouping_obj[-length(grouping_obj)], function(grouping_level){
+    lapply(grouping_level, function(df){
+      column_names <- colnames(df)
+      if(date_column %in% column_names){
+        groups_subset <- column_names[column_names %in% groups]
+        if(length(groups_subset) > 0){
           casting_formula <- as.formula(paste(date_column, "~", paste(temp_groups, collapse = "+")))
-          temp_dt <- reshape::cast(y, casting_formula, fun.aggregate = sum, value = value_choice)
-          temp_ind <- which(colnames(temp_dt) == date_column)
+          casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
+          date_index <- which(colnames(casted_df) == date_column)
 
-          xts::xts(temp_dt[ ,-temp_ind], order.by = temp_dt[ ,temp_ind])
+          xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
         }else{
-          temp_ind <- which(colnames(y) == date_column)
-          xts::xts(y[ ,-temp_ind], order.by = dplyr::pull(y, date_column))
+          date_index <- which(colnames(df) == date_column)
+          xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
         }
       }else{
         NULL
@@ -37,9 +37,9 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt
     })
   })
 
-  main_ls <- rmNullObs(main_ls)
-  main_ls <- main_ls[1:length(groups)]
-  main_ls
+  out_list <- rmNullObs(out_list)
+  out_list <- out_list[1:length(groups)]
+  out_list
 }
 
 get_forecast_stats <- function(forecast_ls, original_ls, date_type = "months"){
