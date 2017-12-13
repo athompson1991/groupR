@@ -22,10 +22,9 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt
       if(date_column %in% column_names){
         groups_subset <- column_names[column_names %in% groups]
         if(length(groups_subset) > 0){
-          casting_formula <- as.formula(paste(date_column, "~", paste(temp_groups, collapse = "+")))
+          casting_formula <- as.formula(paste(date_column, "~", paste(groups_subset, collapse = "+")))
           casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
           date_index <- which(colnames(casted_df) == date_column)
-
           xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
         }else{
           date_index <- which(colnames(df) == date_column)

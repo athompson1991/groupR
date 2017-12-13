@@ -16,42 +16,36 @@
 #'                           )
 #' grouping_obj <- get_groups(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
 get_groups <- function(df, groups, functions = list("count" = "n()"), depth = length(groups)){
-  group_combn <- get_combinations(depth, groups)
-  n_fn <- length(functions)
-  col_names <- names(functions)
-  functions <- as.vector(sapply(col_names, function(f) functions[[f]]))
+  group_combinations <- get_combinations(depth, groups)
+  function_count <- length(functions)
+  column_names <- names(functions)
+  functions <- as.vector(sapply(column_names, function(f) functions[[f]]))
 
-  out_list <- lapply(group_combn, function(mtx){
+  out_list <- lapply(group_combinations, function(mtx){
 
-    temp_df <- apply(mtx, 2, function(col){
-      temp_groups <- as.vector(col)
-      temp_ls <- lapply(functions, function(f){
+    df <- apply(mtx, 2, function(column){
+      group_selection <- as.vector(column)
+      dplyr_list <- lapply(functions, function(f){
         temp_fn <- df %>%
-          dplyr::group_by_(.dots = temp_groups) %>%
+          dplyr::group_by_(.dots = group_selection) %>%
           dplyr::summarize_(lazyeval::interp(f))
         temp_fn
       })
-      main_cols <- as.data.frame(temp_ls[[1]][ ,1:length(temp_groups)])
-      temp_ls <- lapply(temp_ls, function(df) df[ ,-c(1:length(temp_groups))])
-      temp_out <- do.call(cbind, temp_ls)
-      temp_out <- cbind(main_cols, temp_out)
-      temp_out <- dplyr::grouped_df(temp_out, temp_groups)
-      return(temp_out)
+      groups_columns <- as.data.frame(dplyr_list[[1]][ ,1:length(group_selection)])
+      dplyr_list <- lapply(dplyr_list, function(df) df[ ,-c(1:length(group_selection))])
+      out_df <- do.call(cbind, dplyr_list)
+      out_df <- cbind(groups_columns, out_df)
+      out_df <- dplyr::grouped_df(out_df, group_selection)
+      colnames(out_df)[tail(1:ncol(out_df), function_count)] <- column_names
+      return(out_df)
     })
-    comb_names <- apply(mtx, 2, function(col) paste(col, collapse = "..."))
-    names(temp_df) <- comb_names
-    temp_df
+    comb_names <- apply(mtx, 2, function(column) paste(column, collapse = "..."))
+    names(df) <- comb_names
+    df
   })
 
-  ls_nm <- paste("n_", 1:depth, "_group", sep = "")
-  names(out_list) <- ls_nm
-  out_list <- lapply(out_list, function(ls){
-    lapply(ls, function(df){
-      df <- df[ ,!duplicated(colnames(df))]
-      colnames(df)[tail(1:ncol(df), n_fn)] <- col_names
-      df
-    })
-  })
+  names(out_list) <- paste("n_", 1:depth, "_group", sep = "")
+  return(out_list)
 }
 
 #' Perform function(s) on grouping object.
