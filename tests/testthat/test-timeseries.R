@@ -36,5 +36,4 @@ test_that("extract_xts gives right xts names", {
   expect_identical(colnames(extracted_groupr$n_2_group$states), states)
   expect_identical(colnames(extracted_groupr$n_2_group$department), department)
   expect_identical(colnames(extracted_groupr$n_3_group$companies...states), c("company_a/WA", "company_b/WA", "company_c/WA", "company_a/CA", "company_b/CA", "company_c/CA"))
-
 })

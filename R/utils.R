@@ -1,3 +1,4 @@
+is.groupr <- function(x) inherits(x, "groupr")
 
 #' Make every combination of character vector
 #' @param n Maximum rows per combination data frame

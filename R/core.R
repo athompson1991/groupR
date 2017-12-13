@@ -86,7 +86,6 @@ group_obj_apply <- function(group_obj, new_functions, is_cbind = F){
         }else{
           return_this <- new_data_ls
         }
-
         return(return_this)
       }
     })

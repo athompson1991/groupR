@@ -113,9 +113,9 @@ custom_forecast_plot <- function(fcst_obj){
 
 do_modeling <- function(z_data, is_auto_arima = F, ...){
   z_ind   <- as.Date(names(z_data))
-  z_yr    <- year(first(z_ind))
-  z_mth   <- month(first(z_ind))
-  ts_data <- ts(z_data, frequency = 12, start = c(z_yr, z_mth))
+  z_yr    <- lubridate::year(xts::first(z_ind))
+  z_mth   <- lubridate::month(xts::first(z_ind))
+  ts_data <- stats::ts(z_data, frequency = 12, start = c(z_yr, z_mth))
 
   if(is_auto_arima){
     temp_model <- forecast::auto.arima(ts_data)
