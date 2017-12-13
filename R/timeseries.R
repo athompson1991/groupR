@@ -1,13 +1,45 @@
-#' Models time series list with an ARIMA model.
+#' Extracts time series data from grouping object.
 #'
 #' @export
-#' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
-#' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
-#' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
+#' @param grouping_obj Grouping object created with \code{get_groups}
+#' @param groups Groups that will be converted to time series data (\code{xts} object)
+#' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
+#' @param date_col The column with date data which will represent unique index for the returned \code{xts}
+#' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
-xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
-  arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima)
-  group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt"){
+
+  # From StackOverflow: http://stackoverflow.com/questions/26539441
+  is.NullOb <- function(x) is.null(x) | all(sapply(x, is.null))
+  rmNullObs <- function(x) {
+    x <- Filter(Negate(is.NullOb), x)
+    lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
+  }
+
+  main_ls <- lapply(grouping_obj[-length(grouping_obj)], function(x){
+    lapply(x, function(y){
+      c_nms <- colnames(y)
+      if(date_column %in% c_nms){
+        temp_groups <- c_nms[c_nms %in% groups]
+        if(length(temp_groups) > 0){
+          casting_formula <- as.formula(paste(date_column, "~", paste(temp_groups, collapse = "+")))
+          temp_dt <- reshape::cast(y, casting_formula, fun.aggregate = sum, value = value_choice)
+          temp_ind <- which(colnames(temp_dt) == date_column)
+
+          xts::xts(temp_dt[ ,-temp_ind], order.by = temp_dt[ ,temp_ind])
+        }else{
+          temp_ind <- which(colnames(y) == date_column)
+          xts::xts(y[ ,-temp_ind], order.by = dplyr::pull(y, date_column))
+        }
+      }else{
+        NULL
+      }
+    })
+  })
+
+  main_ls <- rmNullObs(main_ls)
+  main_ls <- main_ls[1:length(groups)]
+  main_ls
 }
 
 get_forecast_stats <- function(forecast_ls, original_ls, date_type = "months"){
@@ -96,6 +128,19 @@ do_modeling <- function(z_data, is_auto_arima = F, ...){
   temp_model
 }
 
+#' Models time series list with an ARIMA model.
+#'
+#' @export
+#' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
+#' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
+#' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
+#'
+xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
+  arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima)
+  group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+}
+
+
 #' Plot timeseries groups of grouping object.
 #'
 #' Though a grouping object can be converted to more sophisticated time series data and then plotted,
@@ -155,48 +200,6 @@ do_ts_plot <- function(gr_obj, choice, data_choice, filter = NA, main = "Timeser
   plot(as.zoo(xts_obj), plot.type = "multiple", main = main, panel = my_panel, temp_names = colnames(xts_obj), ylab = NA, xlab = NA, las = 2, ..., xaxt = "n", yaxt = "n")
 }
 
-#' Extracts time series data from grouping object.
-#'
-#' @export
-#' @param grouping_obj Grouping object created with \code{get_groups}
-#' @param groups Groups that will be converted to time series data (\code{xts} object)
-#' @param value_choice The column which will has values that will be in time series. Function applied will be \code{sum} but each value should be unique.
-#' @param date_col The column with date data which will represent unique index for the returned \code{xts}
-#' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
-#'
-extract_xts <- function(grouping_obj, groups, value_choice, date_col = "dd_dt"){
-
-  # From StackOverflow: http://stackoverflow.com/questions/26539441
-  is.NullOb <- function(x) is.null(x) | all(sapply(x, is.null))
-  rmNullObs <- function(x) {
-    x <- Filter(Negate(is.NullOb), x)
-    lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
-  }
-
-  main_ls <- lapply(grouping_obj[-length(grouping_obj)], function(x){
-    lapply(x, function(y){
-      c_nms <- colnames(y)
-      if(date_col %in% c_nms){
-        temp_groups <- c_nms[c_nms %in% groups]
-        if(length(temp_groups) > 0){
-          temp_fm <- as.formula(paste(date_col, "~", paste(temp_groups, collapse = "+")))
-          temp_dt <- reshape::cast(y, temp_fm, fun.aggregate = sum, value = value_choice)
-          temp_ind <- which(colnames(temp_dt) == date_col)
-          xts::xts(temp_dt[ ,-temp_ind], order.by = temp_dt[ ,temp_ind])
-        }else{
-          temp_ind <- which(colnames(y) == date_col)
-          xts::xts(y[ ,-temp_ind], order.by = y[ ,temp_ind])
-        }
-      }else{
-        NULL
-      }
-    })
-  })
-
-  main_ls <- rmNullObs(main_ls)
-  main_ls <- main_ls[1:length(groups)]
-  main_ls
-}
 
 get_forecasts <- function(model_ls){
   lapply(model_ls, function(i){
