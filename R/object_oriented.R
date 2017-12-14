@@ -47,7 +47,11 @@ subset.groupr <- function(groupr, groups, group_level = 1){
 
   out <- new_list
   if(identical(group_level, 1)){
-    out <- out[[1]][groups]
+    if(length(groups) == 1)
+      out <- out[[1]][[groups]]
+    else{
+      out <- out[[1]][groups]
+    }
   }else{
     out <- as.groupr(out)
   }
