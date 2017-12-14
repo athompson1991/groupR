@@ -25,14 +25,6 @@ test_that("get_groups returns proper list", {
   expect_equal(names(test_groupr$n_2_group$company...party), c("company", "party", "avg_salary", "max_salary"))
 })
 
-test_that("get_groups fails as expected", {
-  expect_warning(get_groups(main_df, groups = c("cats", "dogs"), functions = function_list), "Groups not in dataframe: cats, dogs")
-  expect_warning(get_groups(main_df, groups = c("cats", "company"), functions = function_list), "Groups not in dataframe: cats")
-  expect_error(get_groups(c(1,2,3,4,5), groups = c("company"), functions = function_list), "Wrong class type on dataframe argument")
-  expect_error(get_groups(main_df, groups = c(1,2,3), functions = function_list), "Wrong class type on groups argument")
-  expect_error(get_groups(main_df, groups = c("company"), functions = c(1,2,3)), "Wrong class type on functions argument")
-})
-
 test_that("group object has right classes", {
   expect_true(is.groupr(test_groupr))
   expect_true(is.list(test_groupr$n_1_group))
@@ -58,9 +50,8 @@ test_that("group apply produces expected classes", {
 })
 
 test_that("subset works", {
-  expect_equal(length(subset(test_groupr, c("company", "party", "color"))), 3)
-  expect_identical(test_groupr, subset(test_groupr, c("company", "party", "color")))
-  company_subset <- subset(test_groupr, "company")
-  new_groupr <- as.groupr(list(test_groupr$n_1_group, test_groupr$n_2_group[-3], test_groupr$n_3_group))
-  expect_identical(company_subset, new_groupr)
+  expect_equal(length(subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1:3)), 3)
+  expect_identical(test_groupr, subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1:3))
+  expect_identical(test_groupr$n_1_group$company, subset(groupr = test_groupr, groups = "company", group_level = 1))
+  expect_identical(test_groupr$n_1_group, subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1))
 })

@@ -93,19 +93,3 @@ group_obj_apply <- function(group_obj, new_functions, is_cbind = F){
   out <- structure(out, class = "groupr")
   return(out)
 }
-
-subset.groupr <- function(groupr, groups){
-  new_list <- lapply(groupr, function(group_level){
-    full_df_list <- names(group_level)
-    logic_matrix <- as.matrix(sapply(groups, function(string) grepl(string, full_df_list)))
-    if(ncol(logic_matrix) == 1){
-      logic_vector <- TRUE
-    }else{
-      logic_vector <- as.vector(apply(logic_matrix, 1, any))
-    }
-    returned_dfs <- group_level[logic_vector]
-    return(returned_dfs)
-  })
-  new_list <- as.groupr(new_list)
-  return(new_list)
-}
