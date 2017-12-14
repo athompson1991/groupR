@@ -25,6 +25,14 @@ test_that("get_groups returns proper list", {
   expect_equal(names(test_groupr$n_2_group$company...party), c("company", "party", "avg_salary", "max_salary"))
 })
 
+test_that("get_groups fails as expected", {
+  expect_warning(get_groups(main_df, groups = c("cats", "dogs"), functions = function_list), "Groups not in dataframe: cats, dogs")
+  expect_warning(get_groups(main_df, groups = c("cats", "company"), functions = function_list), "Groups not in dataframe: cats")
+  expect_error(get_groups(c(1,2,3,4,5), groups = c("company"), functions = function_list), "Wrong class type on dataframe argument")
+  expect_error(get_groups(main_df, groups = c(1,2,3), functions = function_list), "Wrong class type on groups argument")
+  expect_error(get_groups(main_df, groups = c("company"), functions = c(1,2,3)), "Wrong class type on functions argument")
+})
+
 test_that("group object has right classes", {
   expect_true(is.groupr(test_groupr))
   expect_true(is.list(test_groupr$n_1_group))
