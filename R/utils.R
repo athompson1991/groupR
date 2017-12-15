@@ -49,4 +49,30 @@ new_xts_names <- function(obs, groups){
 }
 
 
+extract_grouping_level <- function(groupr, group_level){
+  work_groupr <- unclass(groupr)
+  return(work_groupr[[group_level]])
+}
+
+drop_grouping_level <- function(groupr, group_level){
+  work_groupr <- unclass(groupr)
+  work_groupr <- work_groupr[-group_level]
+  work_groupr <- as.groupr(work_groupr)
+  return(work_groupr)
+}
+
+extract_df <- function(groupr, group_level, df_name){
+  work_groupr <- unclass(groupr)
+  return(work_groupr[[group_level]][[df_name]])
+}
+
+drop_df <- function(groupr, group_level, df_name){
+  work_groupr <- unclass(groupr)
+  df_index <- which(names(work_groupr[[group_level]]) == df_name)
+  work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
+  work_groupr <- as.groupr(work_groupr)
+  return(work_groupr)
+}
+
+
 

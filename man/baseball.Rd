@@ -9,7 +9,6 @@
    \item{league}{American League or National League}
    \item{division}{East, Central, or West}
    \item{team}{Team name}
-   \item{Rk}{Player ranking}
    \item{Pos}{Player position}
    \item{Name}{Player name}
    \item{Age}{Player’s age at midnight of June 30th of that year}

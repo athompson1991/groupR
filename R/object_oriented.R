@@ -1,31 +1,11 @@
 is.groupr <- function(x) inherits(x, "groupr")
 as.groupr <- function(in_list) structure(in_list, class="groupr")
 
-extract_grouping_level <- function(groupr, group_level){
-  work_groupr <- unclass(groupr)
-  return(work_groupr[[group_level]])
-}
 
-drop_grouping_level <- function(groupr, group_level){
-  work_groupr <- unclass(groupr)
-  work_groupr <- work_groupr[-group_level]
-  work_groupr <- as.groupr(work_groupr)
-  return(work_groupr)
-}
-
-extract_df <- function(groupr, group_level, df_name){
-  work_groupr <- unclass(groupr)
-  return(work_groupr[[group_level]][[df_name]])
-}
-
-drop_df <- function(groupr, group_level, df_name){
-  work_groupr <- unclass(groupr)
-  df_index <- which(names(work_groupr[[group_level]]) == df_name)
-  work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
-  work_groupr <- as.groupr(work_groupr)
-  return(work_groupr)
-}
-
+#' Subset a groupr object
+#'
+#'
+#'
 subset.groupr <- function(groupr, groups, group_level = 1){
 
   work_groupr <- unclass(groupr)
@@ -58,6 +38,16 @@ subset.groupr <- function(groupr, groups, group_level = 1){
   return(out)
 }
 
+#' Printing groupr objects
+#'
+#' Print a groupr object as tree.
+#'
+#' @param groupr_obj A grouping object created with \code{get_groups}
+#' @param include_colnames Boolean for whether or not to print colnames in tree
+#' @examples
+#' bball_groupr <- get_groups(baseball, groups = c("league", "team", "Rk"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
+#' print(bball_groupr)
+#' print(bball_groupr, include_colnames = T)
 print.groupr <- function(groupr_obj, include_colnames = F){
   groups <- names(groupr_obj$n_1_group)
 
