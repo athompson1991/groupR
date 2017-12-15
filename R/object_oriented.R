@@ -45,7 +45,7 @@ subset.groupr <- function(groupr, groups, group_level = 1){
 #' @param groupr_obj A grouping object created with \code{get_groups}
 #' @param include_colnames Boolean for whether or not to print colnames in tree
 #' @examples
-#' bball_groupr <- get_groups(baseball, groups = c("league", "team", "Rk"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
+#' bball_groupr <- get_groups(baseball, groups = c("league", "team"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
 #' print(bball_groupr)
 #' print(bball_groupr, include_colnames = T)
 print.groupr <- function(groupr_obj, include_colnames = F){
