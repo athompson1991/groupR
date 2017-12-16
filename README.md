@@ -1,7 +1,5 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-    ## [1] "C:/Users/Alex/r-projects/groupR_0.1.0.tar.gz"
-
 groupR
 ======
 
@@ -20,7 +18,7 @@ devtools::install_github("athompson1991/groupR")
 Example
 -------
 
-The code in this pseudo-package is used to conduct comprehensive analysis on somewhat abstract datasets. For example, suppose you have this:
+Aggregate everything! In every way! For example, suppose you have this:
 
 | Person  | Company                  | Political Party | Favorite Color | Salary |
 |---------|--------------------------|-----------------|----------------|--------|
@@ -35,14 +33,14 @@ The code in this pseudo-package is used to conduct comprehensive analysis on som
 
 Your boss asks, "Hey Alex, use our database to calculate the average salary by company". So you go and run the numbers. But then, unexpectedly, you are asked again to calculate the average salary, this time by favorite color. You return to your dataset, boot up a pivot table, and return the required result. While you very nearly produce the correct answer, the real demand was for average salary blown out by both company *and* favorite color. Going back to the drawing board, you realize there are any number of ways to calculate the various breakouts. What if (*gasp*) you are asked to break it out by Company vs Color vs *Political Party*?? That means you would have to calculate the average salary by each aggregation, like so:
 
-1.  Overall (Remember, we need to do average salary for the whole dataset as well)
-2.  Company
-3.  Political Party
-4.  Favorite Color
-5.  Company / Political Party
-6.  Company / Favorite Color
-7.  Politcal Party / Favorite Color
-8.  Company / Political Party / Favorite Color
+1.  Company
+2.  Political Party
+3.  Favorite Color
+4.  Company / Political Party
+5.  Company / Favorite Color
+6.  Politcal Party / Favorite Color
+7.  Company / Political Party / Favorite Color
+8.  Overall (Remember, there's an overall average salary as well)
 
 This is a comprehensive list of potential data requests regarding average salary per group, assuming Person does not serve as a group. The code provided here can compute these, as well as any other similar function against the target data (mean, median, sd, etc.).
 
@@ -65,16 +63,42 @@ Now that the data has been loaded, the full list of averages can be easily produ
 
 ``` r
 my_groupr <- get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "max(salary)"))
-my_groupr
+print(my_groupr, include_colnames = T)
 #> n_0_group
 #> n_1_group
 #>   |_company
+#>     |_company
+#>     |_avg_salary
+#>     |_max_salary
 #>   |_party
+#>     |_party
+#>     |_avg_salary
+#>     |_max_salary
 #>   |_color
+#>     |_color
+#>     |_avg_salary
+#>     |_max_salary
 #> n_2_group
 #>   |_company...party
+#>     |_company
+#>     |_party
+#>     |_avg_salary
+#>     |_max_salary
 #>   |_company...color
+#>     |_company
+#>     |_color
+#>     |_avg_salary
+#>     |_max_salary
 #>   |_party...color
+#>     |_party
+#>     |_color
+#>     |_avg_salary
+#>     |_max_salary
 #> n_3_group
 #>   |_company...party...color
+#>     |_company
+#>     |_party
+#>     |_color
+#>     |_avg_salary
+#>     |_max_salary
 ```
