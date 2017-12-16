@@ -43,10 +43,18 @@ extract_df <- function(groupr, groups){
   work_groupr <- unclass(groupr)
   extracted_groups <- names(work_groupr[[1]])
   valid_groups <- groups[groups %in% extracted_groups]
+  crap_groups <- groups[!(groups %in% extracted_groups)]
+  print_msg <- paste0(crap_groups, collapse = ",")
+  if(length(crap_groups) > 0)
+    warning(paste("Not in data:", print_msg))
   group_level <- length(valid_groups)
   group_level_list <- work_groupr[[group_level]]
-  logic_matrix <- sapply(valid_groups, function(s) grepl(s, names(group_level_list)))
-  df_index <- apply(logic_matrix, 1, all)
+  if(length(group_level_list) > 1){
+    logic_matrix <- sapply(valid_groups, function(s) grepl(s, names(group_level_list)))
+    df_index <- apply(logic_matrix, 1, all)
+  } else {
+    df_index <- 1
+  }
   out <- group_level_list[df_index]
   out <- out[[1]]
   return(out)
