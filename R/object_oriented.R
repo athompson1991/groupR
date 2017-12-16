@@ -47,7 +47,7 @@ subset.groupr <- function(groupr, groups, group_level = 1){
 #' @examples
 #' bball_groupr <- get_groups(baseball, groups = c("league", "team"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
 #' print(bball_groupr)
-#' print(bball_groupr, include_colnames = T)
+#' print(bball_groupr, include_colnames = TRUE)
 print.groupr <- function(groupr_obj, include_colnames = F){
   groups <- names(groupr_obj$n_1_group)
 
