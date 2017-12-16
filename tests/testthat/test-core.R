@@ -15,11 +15,11 @@ new_functions <- list(percent_calc = simple_function)
 applied_obj <- group_obj_apply(test_groupr, new_functions = new_functions, is_cbind = T)
 
 test_that("get_groups returns proper list", {
-  expect_equal(names(test_groupr), c("n_1_group", "n_2_group", "n_3_group"))
+  expect_equal(names(test_groupr), c("n_0_group", "n_1_group", "n_2_group", "n_3_group"))
   expect_equal(names(test_groupr$n_1_group), c("company", "party", "color"))
   expect_equal(names(test_groupr$n_2_group), c("company...party", "company...color", "party...color"))
   expect_equal(names(test_groupr$n_3_group), c("company...party...color"))
-  expect_equal(length(two_levels), 2)
+  expect_equal(length(two_levels), 3)
   expect_equal(names(test_groupr$n_1_group$company), c("company", "avg_salary", "max_salary"))
   expect_equal(names(test_groupr$n_2_group$company...party), c("company", "party", "avg_salary", "max_salary"))
 })
@@ -46,11 +46,4 @@ test_that("group apply produces expected names", {
 
 test_that("group apply produces expected classes", {
   expect_true(is.groupr(applied_obj))
-})
-
-test_that("subset works", {
-  expect_equal(length(subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1:3)), 3)
-  expect_identical(test_groupr, subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1:3))
-  expect_identical(test_groupr$n_1_group$company, subset(groupr = test_groupr, groups = "company", group_level = 1))
-  expect_identical(test_groupr$n_1_group, subset(groupr = test_groupr, groups = c("company", "party", "color"), group_level = 1))
 })

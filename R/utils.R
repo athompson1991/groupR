@@ -41,6 +41,8 @@ drop_grouping_level <- function(groupr, group_level){
 
 extract_df <- function(groupr, groups){
   work_groupr <- unclass(groupr)
+  if(names(work_groupr)[1] == "n_0_group")
+    work_groupr <- work_groupr[-1]
   extracted_groups <- names(work_groupr[[1]])
   valid_groups <- groups[groups %in% extracted_groups]
   crap_groups <- groups[!(groups %in% extracted_groups)]

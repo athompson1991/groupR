@@ -38,7 +38,13 @@ get_groups <- function(df, groups, functions = list("count" = "n()"), depth = le
     df
   })
 
-  names(out_list) <- paste("n_", 1:depth, "_group", sep = "")
+  overall <- as.data.frame(sapply(functions, function(s) dplyr::summarise_(df, lazyeval::interp(s))))
+  colnames(overall) <- column_names
+  overall <- dplyr::as.tbl(overall)
+  overall_list <- list(overall = overall)
+
+  out_list <- c(overall_list, out_list)
+  names(out_list) <- paste("n_", 0:depth, "_group", sep = "")
   out <- structure(out_list, class="groupr")
   return(out)
 }
