@@ -36,18 +36,11 @@ extract_df <- function(groupr, groups){
 drop_df <- function(groupr, groups){
   group_level <- length(groups) + 1
   work_groupr <- unclass(groupr)
-  group_level_list <- work_groupr[[group_level]]
-  if(length(group_level_list) > 1){
-    logic_matrix <- sapply(groups, function(s) grepl(s, names(group_level_list)))
-    df_index <- apply(logic_matrix, 1, all)
-  } else {
-    df_index <- 1
-  }
+  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = groups)
   work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
   work_groupr <- as.groupr(work_groupr)
   return(work_groupr)
 }
-
 
 ########################################################################################
 
@@ -79,4 +72,15 @@ new_xts_names <- function(obs, groups){
   data_combinations <- expand.grid(all_unique)
   new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
   return(new_col_names)
+}
+
+calculate_df_index <- function(main_list, group_level, groups){
+  group_level_list <- main_list[[group_level]]
+  if(length(group_level_list) > 1){
+    logic_matrix <- sapply(groups, function(s) grepl(s, names(group_level_list)))
+    df_index <- apply(logic_matrix, 1, all)
+  } else {
+    df_index <- 1
+  }
+  return(df_index)
 }
