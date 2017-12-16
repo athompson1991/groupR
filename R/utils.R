@@ -39,16 +39,24 @@ drop_grouping_level <- function(groupr, group_level){
   return(work_groupr)
 }
 
-extract_df <- function(groupr, group_level, df_name){
+extract_df <- function(groupr, groups){
   work_groupr <- unclass(groupr)
-  return(work_groupr[[group_level]][[df_name]])
+  group_level <- length(groups)
+  group_level_list <- work_groupr[[group_level]]
+  logic_matrix <- sapply(groups, function(s) grepl(s, names(group_level_list)))
+  df_index <- apply(logic_matrix, 1, all)
+  out <- group_level_list[df_index]
+  out <- out[[1]]
+  return(out)
 }
 
-drop_df <- function(groupr, group_level, df_name){
+drop_df <- function(groupr, group_level, groups){
   work_groupr <- unclass(groupr)
-  df_index <- which(names(work_groupr[[group_level]]) == df_name)
+  group_level <- length(group_level)
+  group_level_list <- work_groupr[[group_level]]
+
+  df_index <- which(names(work_groupr[[group_level]]) == groups)
   work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
   work_groupr <- as.groupr(work_groupr)
   return(work_groupr)
 }
-
