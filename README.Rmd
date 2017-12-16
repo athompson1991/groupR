@@ -78,3 +78,4 @@ Now that the data has been loaded, the full list of averages can be easily produ
 my_groupr <- get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "max(salary)"))
 print(my_groupr, include_colnames = T)
 ```
+

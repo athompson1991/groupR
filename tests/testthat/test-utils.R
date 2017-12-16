@@ -25,3 +25,11 @@ test_that("extract dataframe returns correctly", {
   expect_identical(test_groupr$n_1_group$company, warn_extract)
   expect_identical(test_groupr$n_3_group$company...party...color, extract_df(groupr = test_groupr, groups = c("company", "party", "color")))
 })
+
+test_that("drop dataframe returns correctly", {
+  expect_true(is.groupr(drop_df(groupr = test_groupr, groups = "company")))
+  expect_identical(test_groupr$n_1_group[-1], drop_df(groupr = test_groupr, groups = "company")$n_1_group)
+  expect_identical(names(drop_df(groupr = test_groupr, groups = "company")), c("n_0_group", "n_1_group", "n_2_group", "n_3_group"))
+  expect_equal(length(drop_df(groupr = test_groupr, groups = c("company", "party", "color"))$n_3_group), 0)
+  expect_identical(test_groupr$n_2_group[-1], drop_df(groupr = test_groupr, groups = c("company", "party"))$n_2_group)
+})
