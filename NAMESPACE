@@ -4,4 +4,7 @@ export(extract_xts)
 export(get_groups)
 export(group_obj_apply)
 export(xts_to_arima_model)
+export(print.groupr)
 importFrom(magrittr,"%>%")
+
+S3method("print", "groupr")

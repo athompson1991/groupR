@@ -10,6 +10,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-"
 )
+devtools::build()
+devtools::install()
+library(groupR)
 ```
 
 # groupR
@@ -73,6 +76,6 @@ main_df <- data.frame(name, company, party, color, salary)
 Now that the data has been loaded, the full list of averages can be easily produced:
 
 ```{r getgroups, eval=T}
-my_groupr <- groupr::get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "stats::max(salary)"))
-print(my_groupr)
+my_groupr <- get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "max(salary)"))
+print.groupr(my_groupr)
 ```
