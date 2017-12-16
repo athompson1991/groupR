@@ -11,33 +11,22 @@ drop_grouping_level <- function(groupr, group_level){
 }
 
 extract_df <- function(groupr, groups){
-  work_groupr <- unclass(groupr)
-  if(names(work_groupr)[1] == "n_0_group")
-    work_groupr <- work_groupr[-1]
-  extracted_groups <- names(work_groupr[[1]])
-  valid_groups <- groups[groups %in% extracted_groups]
-  crap_groups <- groups[!(groups %in% extracted_groups)]
-  print_msg <- paste0(crap_groups, collapse = ",")
-  if(length(crap_groups) > 0)
-    warning(paste("Not in data:", print_msg))
+  work_groupr <- drop_overall_df(groupr)
+  valid_groups <- clean_raw_groups(work_groupr, groups)
   group_level <- length(valid_groups)
   group_level_list <- work_groupr[[group_level]]
-  if(length(group_level_list) > 1){
-    logic_matrix <- sapply(valid_groups, function(s) grepl(s, names(group_level_list)))
-    df_index <- apply(logic_matrix, 1, all)
-  } else {
-    df_index <- 1
-  }
+  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = valid_groups)
   out <- group_level_list[df_index]
   out <- out[[1]]
   return(out)
 }
 
 drop_df <- function(groupr, groups){
-  group_level <- length(groups) + 1
-  work_groupr <- unclass(groupr)
+  work_groupr <- drop_overall_df(groupr)
+  group_level <- length(groups)
   df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = groups)
   work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
+  work_groupr <- reassign_overall_df(groupr, work_groupr)
   work_groupr <- as.groupr(work_groupr)
   return(work_groupr)
 }
@@ -83,4 +72,30 @@ calculate_df_index <- function(main_list, group_level, groups){
     df_index <- 1
   }
   return(df_index)
+}
+
+drop_overall_df <- function(main_groupr){
+  work_groupr <- unclass(main_groupr)
+  if(names(work_groupr)[1] == "n_0_group")
+    work_groupr <- work_groupr[-1]
+  return(work_groupr)
+}
+
+clean_raw_groups <- function(work_groupr, groups){
+  extracted_groups <- names(work_groupr[[1]])
+  valid_groups <- groups[groups %in% extracted_groups]
+  crap_groups <- groups[!(groups %in% extracted_groups)]
+  print_msg <- paste0(crap_groups, collapse = ",")
+  if(length(crap_groups) > 0)
+    warning(paste("Not in data:", print_msg))
+  return(valid_groups)
+}
+
+reassign_overall_df <- function(original, worked_on){
+  if(names(original)[1] == "n_0_group"){
+    overall_df <- original$n_0_group
+    worked_on <- c(list(overall_df), worked_on)
+    names(worked_on)[1] <- "n_0_group"
+    return(worked_on)
+  }
 }

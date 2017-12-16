@@ -17,6 +17,12 @@ test_that("get_combinations returns as expected", {
   expect_equal(dim(y[[3]]), c(3, 4))
 })
 
+test_that("drop overall df works", {
+  expect_equal(length(drop_overall_df(test_groupr)), 3)
+  expect_true(is.list(drop_overall_df(test_groupr)))
+  expect_identical(names(drop_overall_df(test_groupr)), c("n_1_group", "n_2_group", "n_3_group"))
+})
+
 test_that("extract dataframe returns correctly", {
   expect_identical(test_groupr$n_1_group$company, extract_df(groupr = test_groupr, groups = "company"))
   expect_identical(test_groupr$n_2_group$company...party, extract_df(groupr = test_groupr, groups = c("company", "party")))
