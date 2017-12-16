@@ -72,7 +72,7 @@ main_df <- data.frame(name, company, party, color, salary)
 
 Now that the data has been loaded, the full list of averages can be easily produced:
 
-```{r getgroups}
+```{r getgroups, eval=T}
 my_groupr <- groupr::get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "stats::max(salary)"))
 print(my_groupr)
 ```
