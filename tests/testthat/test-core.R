@@ -8,6 +8,8 @@ test_groupr <- get_groups(
   functions = function_list
 )
 
+two_levels <- get_groups(df = main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"), depth = 2)
+
 simple_function <- function(df) df$avg_salary / df$max_salary
 new_functions <- list(percent_calc = simple_function)
 applied_obj <- group_obj_apply(test_groupr, new_functions = new_functions, is_cbind = T)
@@ -17,10 +19,7 @@ test_that("get_groups returns proper list", {
   expect_equal(names(test_groupr$n_1_group), c("company", "party", "color"))
   expect_equal(names(test_groupr$n_2_group), c("company...party", "company...color", "party...color"))
   expect_equal(names(test_groupr$n_3_group), c("company...party...color"))
-  expect_equal(
-    length(get_groups(df = main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"), depth = 2)),
-    2
-  )
+  expect_equal(length(two_levels), 2)
   expect_equal(names(test_groupr$n_1_group$company), c("company", "avg_salary", "max_salary"))
   expect_equal(names(test_groupr$n_2_group$company...party), c("company", "party", "avg_salary", "max_salary"))
 })
