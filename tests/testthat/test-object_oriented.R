@@ -17,5 +17,5 @@ test_that("print works correctly", {
                                               "n_1_group\n  |_company\n    |_company\n    |_avg_salary\n    |_max_salary\n  |_party\n    |_party\n    |_avg_salary\n    |_max_salary\n  |_color\n    |_color\n    |_avg_salary\n    |_max_salary\n",
                                               "n_2_group\n  |_company...party\n    |_company\n    |_party\n    |_avg_salary\n    |_max_salary\n  |_company...color\n    |_company\n    |_color\n    |_avg_salary\n    |_max_salary\n  |_party...color\n    |_party\n    |_color\n    |_avg_salary\n    |_max_salary\n",
                                               "n_3_group\n  |_company...party...color\n    |_company\n    |_party\n    |_color\n    |_avg_salary\n    |_max_salary", collapse="")
-               )
+  )
 })

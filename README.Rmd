@@ -1,9 +1,34 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
 # groupR
+
 
 [![Build Status](https://travis-ci.org/athompson1991/groupR.svg?branch=master)](https://travis-ci.org/athompson1991/groupR)
 [![codecov.io](https://codecov.io/github/athompson1991/groupR/coverage.svg?branch=master)](https://codecov.io/github/athompson1991/groupR?branch=master)
 [![Dependency Status](https://dependencyci.com/github/athompson1991/groupR/badge)](https://dependencyci.com/github/athompson1991/groupR)
-## Introduction
+
+## Installation
+
+You can install groupR from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("athompson1991/groupR")
+```
+
+## Example
 
 The code in this pseudo-package is used to conduct comprehensive analysis on somewhat abstract datasets. For example, suppose you have this:
 
@@ -31,11 +56,11 @@ Your boss asks, "Hey Alex, use our database to calculate the average salary by c
 
 This is a comprehensive list of potential data requests regarding average salary per group, assuming Person does not serve as a group. The code provided here can compute these, as well as any other similar function against the target data (mean, median, sd, etc.).
 
-## Usage
 
+## Usage
 First, let's create our dataset:
 
-```R
+```{r build_dataset}
 name <- c("Joe","Bob","Janet","Heather","John","Winston","Melissa","Monica")
 company <- c("University of Fakesville" ,"Coal Mine Incorporated" ,"University of Fakesville" ,"Coal Mine Incorporated" ,"Coal Mine Incorporated" ,"Coal Mine Incorporated" ,"University of Fakesville" ,"University of Fakesville")
 party <- c("Whig" ,"Whig" ,"Libertarian" ,"Whig" ,"Libertarian" ,"Whig" ,"Libertarian" ,"Libertarian")
@@ -47,50 +72,7 @@ main_df <- data.frame(name, company, party, color, salary)
 
 Now that the data has been loaded, the full list of averages can be easily produced:
 
-```R
-> grouping_obj <- get_groups(main_df, c("company", "party", "color"), functions = list("avg_salary" = "mean(salary)"))
-> sapply(grouping_obj, names)
-
-# $n_1_group
-# [1] "company" "party"   "color"  
-# 
-# $n_2_group
-# [1] "company/party" "company/color" "party/color"  
-# 
-# $n_3_group
-# [1] "company/party/color"
-# 
-# $no_groups
-# [1] "avg_salary"
-```
-With this, we can select any group we are interested in:
-
-```R
-> grouping_obj$n_1_group$company
-
-#                    company avg_salary
-# 1   Coal Mine Incorporated       77.5
-# 2 University of Fakesville       95.0
-```
-
-This is the basic idea. Multiple functions can be applied to the data at the same time, so, for example, if we also wanted to count the employees in each group and list the maximum salary all in one dataframe for each combination, that would be possible like so:
-
-```R
-> function_list <- list(avg_salary = "mean(salary)", employee_count = "n()", max_salary = "max(salary)")
-> grouping_obj <- get_groups(main_df, c("company", "party", "color"), functions = function_list)
-
-> grouping_obj$n_1_group$company
-
-#                    company avg_salary employee_count max_salary
-# 1   Coal Mine Incorporated       77.5              4        100
-# 2 University of Fakesville       95.0              4        120
-
-> grouping_obj$n_2_group$`company/party`
-
-#                    company       party avg_salary employee_count max_salary
-#                    <fctr>      <fctr>      <dbl>          <int>      <dbl>
-# 1   Coal Mine Incorporated Libertarian   60.00000              1         60
-# 2   Coal Mine Incorporated        Whig   83.33333              3        100
-# 3 University of Fakesville Libertarian   93.33333              3        120
-# 4 University of Fakesville        Whig  100.00000              1        100
+```{r getgroups}
+my_groupr <- groupr::get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)", max_salary = "stats::max(salary)"))
+print(my_groupr)
 ```
