@@ -20,4 +20,5 @@ test_that("get_combinations returns as expected", {
 test_that("extract dataframe returns correctly", {
   expect_identical(test_groupr$n_1_group$company, extract_df(groupr = test_groupr, groups = "company"))
   expect_identical(test_groupr$n_2_group$company...party, extract_df(groupr = test_groupr, groups = c("company", "party")))
+  expect_identical(test_groupr$n_1_group$company, extract_df(groupr = test_groupr, groups = c("company", "potato")))
 })
