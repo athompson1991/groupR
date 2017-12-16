@@ -1,20 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-    ## "C:/PROGRA~1/R/R-34~1.3/bin/x64/R" --no-site-file --no-environ --no-save  \
-    ##   --no-restore --quiet CMD build "C:\Users\Alex\r-projects\groupR"  \
-    ##   --no-resave-data --no-manual
-
-    ## 
-
     ## [1] "C:/Users/Alex/r-projects/groupR_0.1.0.tar.gz"
-
-    ## Installing groupR
-
-    ## "C:/PROGRA~1/R/R-34~1.3/bin/x64/R" --no-site-file --no-environ --no-save  \
-    ##   --no-restore --quiet CMD INSTALL "C:/Users/Alex/r-projects/groupR"  \
-    ##   --library="C:/Users/Alex/Documents/R/win-library/3.4" --install-tests
-
-    ## 
 
 groupR
 ======
