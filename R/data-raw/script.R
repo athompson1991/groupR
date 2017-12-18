@@ -21,10 +21,10 @@ dates <- seq(as.Date("2017-01-01"), length.out = 100, by = "day")
 companies <- c("company_a", "company_b", "company_c")
 states <- c("WA", "CA")
 department <- c("sales", "marketing")
-obs <- abs(rnorm(1200))
+budget <- abs(rnorm(1200))
 
-time_df <- cbind(expand.grid(companies, states, department, dates), obs)
-names(time_df) <- c("companies", "states", "department", "dates", "obs")
+time_df <- cbind(expand.grid(companies, states, department, dates), budget)
+names(time_df) <- c("companies", "states", "department", "dates", "budget")
 
 
 
