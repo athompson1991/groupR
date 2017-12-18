@@ -14,9 +14,6 @@ groups <- c("companies", "states", "department")
 test_groupr <- get_groups(test_df, groups = c(groups, "dates"), functions = list(avg = "mean(obs)"))
 extracted_groupr <- extract_xts(grouping_obj = test_groupr, value_choice = "avg", date_col = "dates", groups = groups)
 
-congress_groupr <- get_groups(df = rollcalls, groups = c("first_of_month", "congress", "chamber", "vote_result"))
-congress_xts <- extract_xts(congress_groupr, groups = c("vote_result"), value_choice = "count", date_column = "first_of_month")
-
 test_that("extract_xts gives right classes", {
   expect_identical(class(extracted_groupr), "list")
   expect_identical(class(extracted_groupr$n_1_group), "list")
