@@ -50,6 +50,7 @@ new_xts_names <- function(obs, groups){
   })
   data_combinations <- expand.grid(all_unique)
   new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
+  new_col_names <- gsub(pattern = " ", "_", new_col_names)
   return(new_col_names)
 }
 

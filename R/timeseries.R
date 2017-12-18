@@ -35,7 +35,10 @@ extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt
 
   out_list <- rmNullObs(out_list)
   out_list <- out_list[1:length(groups)]
-  names(out_list$n_1_group) <- "overall"
+  names(out_list) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
+  out_list$n_0_group <- out_list[[1]][[1]]
+  names(out_list$n_0_group) <- "overall"
+  out_list <- as.groupr(out_list)
   return(out_list)
 }
 

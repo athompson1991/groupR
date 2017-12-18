@@ -1,39 +1,50 @@
 context("Time series")
-set.seed(12345)
 
-dates <- seq(as.Date("2017-01-01"), length.out = 100, by = "day")
-companies <- c("company_a", "company_b", "company_c")
-states <- c("WA", "CA")
-department <- c("sales", "marketing")
-obs <- abs(rnorm(1200))
+bad_names <- c("company a", "company b", "company c")
+time_groupr <- get_groups(
+  time_df,
+  groups = c("companies", "states", "department", "dates"),
+  functions = list(avg = "mean(obs)")
+)
 
-test_df <- cbind(expand.grid(companies, states, department, dates), obs)
-names(test_df) <- c("companies", "states", "department", "dates", "obs")
-
-groups <- c("companies", "states", "department")
-test_groupr <- get_groups(test_df, groups = c(groups, "dates"), functions = list(avg = "mean(obs)"))
-extracted_groupr <- extract_xts(grouping_obj = test_groupr, value_choice = "avg", date_col = "dates", groups = groups)
-
-test_that("extract_xts gives right classes", {
-  expect_identical(class(extracted_groupr), "list")
-  expect_identical(class(extracted_groupr$n_1_group), "list")
-  expect_identical(class(extracted_groupr$n_1_group$overall), c("xts", "zoo"))
-  expect_identical(class(extracted_groupr$n_2_group$companies), c("xts", "zoo"))
-  expect_identical(class(extracted_groupr$n_2_group$states), c("xts", "zoo"))
-  expect_identical(class(extracted_groupr$n_2_group$department), c("xts", "zoo"))
-})
+extracted_groupr <- extract_xts(
+  grouping_obj = time_groupr,
+  value_choice = "avg",
+  date_col = "dates",
+  groups = c("companies", "states", "department")
+)
 
 test_that("extract_xts gives right group level names", {
-  expect_identical(names(extracted_groupr), c("n_1_group", "n_2_group", "n_3_group"))
-  expect_identical(names(extracted_groupr$n_1_group), "overall")
-  expect_identical(names(extracted_groupr$n_2_group), c("companies", "states", "department"))
-  expect_identical(names(extracted_groupr$n_3_group), c("companies...states", "companies...department", "states...department"))
+  expect_identical(names(extracted_groupr), c("n_0_group", "n_1_group", "n_2_group"))
+  expect_identical(names(extracted_groupr$n_0_group), "overall")
+  expect_identical(names(extracted_groupr$n_1_group), c("companies", "states", "department"))
+  expect_identical(names(extracted_groupr$n_2_group), c("companies...states", "companies...department", "states...department"))
+})
+
+test_that("extract_xts gives right classes", {
+  expect_identical(class(extracted_groupr), "groupr")
+  expect_identical(class(extracted_groupr$n_0_group), c("xts", "zoo"))
+  expect_identical(class(extracted_groupr$n_1_group$companies), c("xts", "zoo"))
+  expect_identical(class(extracted_groupr$n_1_group$states), c("xts", "zoo"))
+  expect_identical(class(extracted_groupr$n_1_group$department), c("xts", "zoo"))
 })
 
 test_that("extract_xts gives right xts names", {
-  expect_identical(colnames(extracted_groupr$n_1_group$overall), "avg")
-  expect_identical(colnames(extracted_groupr$n_2_group$companies),companies)
-  expect_identical(colnames(extracted_groupr$n_2_group$states), states)
-  expect_identical(colnames(extracted_groupr$n_2_group$department), department)
-  expect_identical(colnames(extracted_groupr$n_3_group$companies...states), c("company_a/WA", "company_b/WA", "company_c/WA", "company_a/CA", "company_b/CA", "company_c/CA"))
+  expect_identical(colnames(extracted_groupr$n_0_group), "overall")
+  expect_identical(colnames(extracted_groupr$n_1_group$companies), c("company_a", "company_b", "company_c"))
+  expect_identical(colnames(extracted_groupr$n_1_group$states), c("WA", "CA"))
+  expect_identical(colnames(extracted_groupr$n_1_group$department), c("sales", "marketing"))
+  expect_identical(colnames(extracted_groupr$n_2_group$companies...states), c("company_a/WA", "company_b/WA", "company_c/WA", "company_a/CA", "company_b/CA", "company_c/CA"))
+})
+
+test_that("bad names are accounted for", {
+  time_df$companies <- rep(bad_names, 400)
+  time_groupr <- get_groups(time_df, groups = c("companies", "states", "department", "dates"), functions = list(avg = "mean(obs)"))
+  extracted_groupr <- extract_xts(grouping_obj = time_groupr, value_choice = "avg", date_col = "dates", groups = c("companies", "states", "department"))
+  expect_identical(colnames(extracted_groupr$n_1_group$companies), c("company_a", "company_b", "company_c"))
+  expect_identical(colnames(extracted_groupr$n_2_group$companies...states), c("company_a/WA", "company_b/WA", "company_c/WA", "company_a/CA", "company_b/CA", "company_c/CA"))
+})
+
+test_that("values are correct", {
+  expect_equal(as.numeric(extract_df(extracted_groupr, "companies")[1,1]), 0.647116, tolerance = 0.0001)
 })
