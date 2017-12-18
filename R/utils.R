@@ -7,28 +7,18 @@ drop_grouping_level <- function(groupr, group_level){
   work_groupr <- unclass(groupr)
   work_groupr <- work_groupr[-group_level]
   work_groupr <- as.groupr(work_groupr)
+  work_groupr <- extract_drop_util(groupr=groupr, groups=groups, return_type = "drop")
   return(work_groupr)
 }
 
 extract_df <- function(groupr, groups){
-  work_groupr <- drop_overall_df(groupr)
-  valid_groups <- clean_raw_groups(work_groupr, groups)
-  group_level <- length(valid_groups)
-  group_level_list <- work_groupr[[group_level]]
-  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = valid_groups)
-  out <- group_level_list[df_index]
-  out <- out[[1]]
+  out <- extract_drop_util(groupr = groupr, groups, return_type="extract")
   return(out)
 }
 
 drop_df <- function(groupr, groups){
-  work_groupr <- drop_overall_df(groupr)
-  group_level <- length(groups)
-  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = groups)
-  work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
-  work_groupr <- reassign_overall_df(groupr, work_groupr)
-  work_groupr <- as.groupr(work_groupr)
-  return(work_groupr)
+  out <- extract_drop_util(groupr=groupr, groups=groups, return_type = "drop")
+  return(out)
 }
 
 ########################################################################################
@@ -98,4 +88,24 @@ reassign_overall_df <- function(original, worked_on){
     names(worked_on)[1] <- "n_0_group"
     return(worked_on)
   }
+}
+
+extract_drop_util <- function(groupr, groups, return_type){
+  return_this <- NULL
+  work_groupr <- drop_overall_df(groupr)
+  valid_groups <- clean_raw_groups(work_groupr, groups)
+  group_level <- length(valid_groups)
+  group_level_list <- work_groupr[[group_level]]
+  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = valid_groups)
+  if(return_type == "extract"){
+    return_this <- group_level_list[df_index]
+    return_this <- return_this[[1]]
+  }
+  if(return_type == "drop"){
+    work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
+    work_groupr <- reassign_overall_df(groupr, work_groupr)
+    work_groupr <- as.groupr(work_groupr)
+    return_this <- work_groupr
+  }
+  return(return_this)
 }
