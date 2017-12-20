@@ -108,11 +108,11 @@ extract_drop_util <- function(groupr, groups, return_type){
 
 subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- lapply(groupr[-1], function(level){
-    fixed_level <- lapply(level, function(df){
-      if(groups %in% names(df))
-        return(df)
-    })
-    fixed_level[sapply(fixed_level, is.null)] <- NULL
+    if(type == "intersect")
+      return_dfs <- sapply(level, function(df) all(groups %in% colnames(df)))
+    else if(type == "union")
+      return_dfs <- sapply(level, function(df) any(groups %in% colnames(df)))
+    fixed_level <- level[return_dfs]
     return(fixed_level)
   })
   worked_on <- reassign_overall_df(groupr, worked_on)
