@@ -8,14 +8,15 @@
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
 extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
-  fixed_groupr <- eliminate_nondates(groupr, date_column)
+  fixed_groupr <- subset(groupr, date_column)
   out <- lapply(fixed_groupr[-1], function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
       return_xts <- NULL
       groups_subset <- column_names[column_names %in% groups]
       if(length(groups_subset) > 0){
-        casting_formula <- as.formula(paste(date_column, "~", paste(groups_subset, collapse = "+")))
+        formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
+        casting_formula <- as.formula(formula_text)
         casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
         date_index <- which(colnames(casted_df) == date_column)
         return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
@@ -65,18 +66,4 @@ xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
   group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
 }
 
-
-eliminate_nondates <- function(groupr, date_name){
-  worked_on <- lapply(groupr[-1], function(level){
-    fixed_level <- lapply(level, function(df){
-      if(date_name %in% names(df))
-        return(df)
-    })
-    fixed_level[sapply(fixed_level, is.null)] <- NULL
-    return(fixed_level)
-  })
-  worked_on <- reassign_overall_df(groupr, worked_on)
-  worked_on <- as.groupr(worked_on)
-  return(worked_on)
-}
 

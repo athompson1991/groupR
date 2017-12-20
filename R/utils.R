@@ -105,3 +105,17 @@ extract_drop_util <- function(groupr, groups, return_type){
   }
   return(return_this)
 }
+
+subset.groupr <- function(groupr, groups, type = "intersect"){
+  worked_on <- lapply(groupr[-1], function(level){
+    fixed_level <- lapply(level, function(df){
+      if(groups %in% names(df))
+        return(df)
+    })
+    fixed_level[sapply(fixed_level, is.null)] <- NULL
+    return(fixed_level)
+  })
+  worked_on <- reassign_overall_df(groupr, worked_on)
+  worked_on <- as.groupr(worked_on)
+  return(worked_on)
+}
