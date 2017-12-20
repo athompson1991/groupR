@@ -8,7 +8,8 @@
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
 extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
-  out_list <- lapply(groupr[-length(groupr)], function(grouping_level){
+  fixed_groupr <- eliminate_nondates(groupr, date_column)
+  out_list <- lapply(fixed_groupr[-1], function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
       return_xts <- NULL
