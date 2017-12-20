@@ -58,7 +58,7 @@ calculate_df_index <- function(main_list, group_level, groups){
   group_level_list <- main_list[[group_level]]
   if(length(group_level_list) > 1){
     logic_matrix <- sapply(groups, function(s) grepl(s, names(group_level_list)))
-    df_index <- apply(logic_matrix, 1, all)
+    df_index <- which(apply(logic_matrix, 1, all))
   } else {
     df_index <- 1
   }

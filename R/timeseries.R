@@ -68,3 +68,18 @@ xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
   group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
 }
 
+
+eliminate_nondates <- function(groupr, date_name){
+  worked_on <- lapply(groupr[-1], function(level){
+    fixed_level <- lapply(level, function(df){
+      if(date_name %in% names(df))
+        return(df)
+    })
+    fixed_level[sapply(fixed_level, is.null)] <- NULL
+    return(fixed_level)
+  })
+  worked_on <- reassign_overall_df(groupr, worked_on)
+  worked_on <- as.groupr(worked_on)
+  return(worked_on)
+}
+
