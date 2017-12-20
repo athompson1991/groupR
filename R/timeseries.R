@@ -26,7 +26,8 @@ extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
       }
       return(return_xts)
     })
-    names(xts_list) <- gsub(names(xts_list), pattern = "*\\.\\.\\.dates", replacement="")
+    replacement_pattern <- paste0("(*\\.\\.\\.", date_column, ")|(", date_column, "\\.\\.\\.*)")
+    names(xts_list) <- gsub(names(xts_list), pattern = replacement_pattern, replacement="")
     return(xts_list)
   })
 
