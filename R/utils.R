@@ -37,13 +37,6 @@ get_combinations <- function(n, char_vec){
   return(full_list)
 }
 
-# From StackOverflow: http://stackoverflow.com/questions/26539441
-is.NullOb <- function(x) is.null(x) | all(sapply(x, is.null))
-rmNullObs <- function(x) {
-  x <- Filter(Negate(is.NullOb), x)
-  lapply(x, function(x) if (is.list(x)) rmNullObs(x) else x)
-}
-
 new_xts_names <- function(obs, groups){
   all_unique <- sapply(groups, function(group){
     unique(as.character(dplyr::pull(obs, group)))
