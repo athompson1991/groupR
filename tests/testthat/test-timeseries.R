@@ -8,7 +8,7 @@ time_groupr <- get_groups(
 )
 
 extracted_groupr <- extract_xts(
-  grouping_obj = time_groupr,
+  groupr = time_groupr,
   value_choice = "avg_budget",
   date_col = "dates",
   groups = c("companies", "states", "department")
@@ -40,7 +40,7 @@ test_that("extract_xts gives right xts names", {
 test_that("bad names are accounted for", {
   time_df$companies <- rep(bad_names, 400)
   time_groupr <- get_groups(time_df, groups = c("companies", "states", "department", "dates"), functions = list(avg_budget = "mean(budget)"))
-  extracted_groupr <- extract_xts(grouping_obj = time_groupr, value_choice = "avg_budget", date_col = "dates", groups = c("companies", "states", "department"))
+  extracted_groupr <- extract_xts(groupr = time_groupr, value_choice = "avg_budget", date_col = "dates", groups = c("companies", "states", "department"))
   expect_identical(colnames(extracted_groupr$n_1_group$companies), c("company_a", "company_b", "company_c"))
   expect_identical(colnames(extracted_groupr$n_2_group$companies...states), c("company_a/WA", "company_b/WA", "company_c/WA", "company_a/CA", "company_b/CA", "company_c/CA"))
 })

@@ -1,14 +1,14 @@
 #' Extracts time series data from grouping object.
 #'
 #' @export
-#' @param grouping_obj Grouping object created with \code{get_groups}
+#' @param groupr Grouping object created with \code{get_groups}
 #' @param groups Groups that will be converted to time series data (\code{xts} object)
 #' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
 #' @param date_col The column with date data which will represent unique index for the returned \code{xts}
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
-extract_xts <- function(grouping_obj, groups, value_choice, date_column = "dd_dt"){
-  out_list <- lapply(grouping_obj[-length(grouping_obj)], function(grouping_level){
+extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
+  out_list <- lapply(groupr[-length(groupr)], function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
       return_xts <- NULL
