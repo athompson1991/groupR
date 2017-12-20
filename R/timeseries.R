@@ -9,7 +9,7 @@
 #'
 extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
   fixed_groupr <- eliminate_nondates(groupr, date_column)
-  out_list <- lapply(fixed_groupr[-1], function(grouping_level){
+  out <- lapply(fixed_groupr[-1], function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
       return_xts <- NULL
@@ -31,12 +31,12 @@ extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
     return(xts_list)
   })
 
-  out_list <- out_list[1:length(groups)]
-  names(out_list) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
-  out_list$n_0_group <- out_list[[1]][[1]]
-  names(out_list$n_0_group) <- "overall"
-  out_list <- as.groupr(out_list)
-  return(out_list)
+  out <- out[1:length(groups)]
+  names(out) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
+  out$n_0_group <- out[[1]][[1]]
+  names(out$n_0_group) <- "overall"
+  out <- as.groupr(out)
+  return(out)
 }
 
 do_modeling <- function(z_data, is_auto_arima = F, ...){
