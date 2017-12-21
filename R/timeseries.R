@@ -8,34 +8,37 @@
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
 extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
-  fixed_groupr <- subset(groupr, date_column)
-  out <- lapply(fixed_groupr[-1], function(grouping_level){
+  fixed_groupr <- subset(groupr, date_column, type = "intersect")
+  out <- lapply(fixed_groupr, function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
       return_xts <- NULL
-      groups_subset <- column_names[column_names %in% groups]
-      if(length(groups_subset) > 0){
-        formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
-        casting_formula <- as.formula(formula_text)
-        casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
-        date_index <- which(colnames(casted_df) == date_column)
-        return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
-        colnames(return_xts) <- new_xts_names(df, groups_subset)
-      }else{
+      is_overall <- setequal(column_names, c(date_column, value_choice))
+      if(is_overall){
         date_index <- which(colnames(df) == date_column)
         return_xts <- xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
+      } else{
+        groups_subset <- column_names[which(column_names %in% groups)]
+        if(length(groups_subset) > 0){
+          formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
+          casting_formula <- as.formula(formula_text)
+          casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
+          date_index <- which(colnames(casted_df) == date_column)
+          return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
+          colnames(return_xts) <- new_xts_names(df, groups_subset)
+        }
       }
       return(return_xts)
     })
     replacement_pattern <- paste0("(*\\.\\.\\.", date_column, ")|(", date_column, "\\.\\.\\.*)")
     names(xts_list) <- gsub(names(xts_list), pattern = replacement_pattern, replacement="")
+    xts_list[sapply(xts_list, is.null)] <- NULL
     return(xts_list)
   })
 
-  out <- out[1:length(groups)]
-  names(out) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
-  out$n_0_group <- out[[1]][[1]]
-  names(out$n_0_group) <- "overall"
+  # names(out) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
+  # out$n_0_group <- out[[1]][[1]]
+  # names(out$n_0_group) <- "overall"
   out <- as.groupr(out)
   return(out)
 }
