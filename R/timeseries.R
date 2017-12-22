@@ -7,7 +7,9 @@
 #' @param date_col The column with date data which will represent unique index for the returned \code{xts}
 #' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #'
-extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
+extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
+  groups <- names(groupr$n_1_group)
+  groups <- groups[groups != date_column]
   fixed_groupr <- subset(groupr, date_column, type = "intersect")
   out <- lapply(fixed_groupr, function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
@@ -19,13 +21,15 @@ extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
         return_xts <- xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
       } else{
         groups_subset <- column_names[which(column_names %in% groups)]
+        formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
         if(length(groups_subset) > 0){
-          formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
           casting_formula <- as.formula(formula_text)
           casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
           date_index <- which(colnames(casted_df) == date_column)
           return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
-          colnames(return_xts) <- new_xts_names(df, groups_subset)
+          new_colnames <- new_xts_names(df, groups_subset)
+          if(length(new_colnames) == ncol(return_xts))
+            colnames(return_xts) <- new_colnames
         }
       }
       return(return_xts)
@@ -36,10 +40,8 @@ extract_xts <- function(groupr, groups, value_choice, date_column = "dd_dt"){
     return(xts_list)
   })
 
-  # names(out) <- paste("n", 0:(length(groups)- 1), "group", sep="_")
-  # out$n_0_group <- out[[1]][[1]]
-  # names(out$n_0_group) <- "overall"
   out <- as.groupr(out)
+  out <- clean_extracted_groupr(out)
   return(out)
 }
 
@@ -69,4 +71,19 @@ xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
   group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
 }
 
+clean_extracted_groupr <- function(groupr){
+  groupr$n_0_group <- NULL
+  names(groupr) <- paste("n", 0:(length(groupr) - 1), "group", sep= "_")
+  groupr$n_0_group <- groupr$n_0_group[[1]]
+  names(groupr$n_0_group) <- "overall"
+  return(groupr)
+}
 
+new_xts_names <- function(df, groups){
+  data_combinations <- as.data.frame(dplyr::distinct(df[ ,groups]))
+  new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
+  new_col_names <- gsub(pattern = " ", "_", new_col_names)
+  new_col_names <- tolower(new_col_names)
+  new_col_names[new_col_names == ""] <- "blank_string"
+  return(new_col_names)
+}

@@ -37,18 +37,6 @@ get_combinations <- function(n, char_vec){
   return(full_list)
 }
 
-new_xts_names <- function(obs, groups){
-  all_unique <- sapply(groups, function(group){
-    unique(as.character(dplyr::pull(obs, group)))
-  })
-  data_combinations <- expand.grid(all_unique)
-  new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
-  new_col_names <- gsub(pattern = " ", "_", new_col_names)
-  new_col_names <- tolower(new_col_names)
-  new_col_names[new_col_names == ""] <- "blank_string"
-  return(new_col_names)
-}
-
 calculate_df_index <- function(main_list, group_level, groups){
   group_level_list <- main_list[[group_level]]
   if(length(group_level_list) > 1){

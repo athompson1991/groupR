@@ -7,8 +7,6 @@ test_groupr <- get_groups(
   groups = c("company", "party", "color"),
   functions = function_list
 )
-congress_groupr <- get_groups(df = rollcalls, groups = c("first_of_month", "congress", "chamber", "vote_result"))
-
 
 test_that("get_combinations returns as expected", {
   x <- c("foo", "bar", "baz", "potato")
@@ -43,9 +41,4 @@ test_that("drop dataframe returns correctly", {
   expect_identical(test_groupr$n_2_group[-1], drop_df(groupr = test_groupr, groups = c("company", "party"))$n_2_group)
   expect_warning(warn_drop <- drop_df(groupr = test_groupr, groups = c("company", "potato")), "Not in data: potato")
   expect_identical(test_groupr$n_1_group[-1], warn_drop$n_1_group)
-})
-
-test_that("new_xts_names works in a sensible manner", {
-  expect_identical(new_xts_names(test_groupr$n_1_group$company, "company"), c("coal_mine_incorporated", "university_of_fakesville"))
-  expect_identical(new_xts_names(congress_groupr$n_1_group$vote_result, "vote_result")[1:3], c("blank_string","agreed_to", "amendment_agreed_to"))
 })
