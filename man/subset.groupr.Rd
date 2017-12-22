@@ -4,7 +4,7 @@
 \alias{subset.groupr}
 \title{Subset a groupr object}
 \usage{
-\method{subset}{groupr}(groupr, groups, group_level = 1)
+\method{subset}{groupr}(groupr, groups, type = "intersect")
 }
 \description{
 Subset a groupr object
