@@ -1,43 +1,6 @@
 is.groupr <- function(x) inherits(x, "groupr")
 as.groupr <- function(in_list) structure(in_list, class="groupr")
 
-
-#' Subset a groupr object
-#'
-#'
-#'
-subset.groupr <- function(groupr, groups, group_level = 1){
-
-  work_groupr <- unclass(groupr)
-  new_list <- list()
-
-  new_list <- lapply(work_groupr[group_level], function(group_level){
-    full_df_list <- names(group_level)
-    logic_matrix <- as.matrix(sapply(groups, function(string) grepl(string, full_df_list)))
-
-    # Last grouping level needs to be treated differently
-    if(ncol(logic_matrix) == 1)
-      logic_vector <- TRUE
-    else
-      logic_vector <- as.vector(apply(logic_matrix, 1, any))
-
-    returned_dfs <- group_level[logic_vector]
-    return(returned_dfs)
-  })
-
-  out <- new_list
-  if(identical(group_level, 1)){
-    if(length(groups) == 1)
-      out <- out[[1]][[groups]]
-    else{
-      out <- out[[1]][groups]
-    }
-  }else{
-    out <- as.groupr(out)
-  }
-  return(out)
-}
-
 #' Printing groupr objects
 #'
 #' Print a groupr object as tree.
