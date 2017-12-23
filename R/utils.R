@@ -11,11 +11,21 @@ drop_grouping_level <- function(groupr, group_level){
   return(work_groupr)
 }
 
+#' Extract or drop an observation
+#'
+#' Pull a leaf from the \code{groupr} tree. This will typically return a dataframe or an \code{xts} object.
+#'
+#' @export
+#' @param groupr The groupr object to pull from
+#' @param groups The desired groups
+#' @return The desired observation, typically a dataframe or \code{xts} object
 extract_df <- function(groupr, groups){
   out <- extract_drop_util(groupr = groupr, groups, return_type="extract")
   return(out)
 }
 
+#' @describeIn extract_df Drop an observation
+#'
 drop_df <- function(groupr, groups){
   out <- extract_drop_util(groupr=groupr, groups=groups, return_type = "drop")
   return(out)
@@ -94,6 +104,10 @@ extract_drop_util <- function(groupr, groups, return_type){
   return(return_this)
 }
 
+#'
+#'
+#'
+#'
 subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- lapply(groupr[-1], function(level){
     if(type == "intersect")

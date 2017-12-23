@@ -5,6 +5,7 @@ as.groupr <- function(in_list) structure(in_list, class="groupr")
 #'
 #' Print a groupr object as tree.
 #'
+#' @export
 #' @param groupr_obj A grouping object created with \code{get_groups}
 #' @param include_colnames Boolean for whether or not to print colnames in tree
 #' @examples
