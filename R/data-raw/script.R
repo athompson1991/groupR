@@ -8,7 +8,7 @@ party <- c("Whig" ,"Whig" ,"Libertarian" ,"Whig" ,"Libertarian" ,"Whig" ,"Libert
 color <- c("Orange", "Blue", "Orange", "Green", "Green", "Blue", "Red", "Red")
 salary <- c(100,70,80,80,60,100,120,80)
 
-main_df <- data.frame(name, company, party, color, salary)
+main_df <- data.frame(name, company, party, color, salary, stringsAsFactors = F)
 
 
 ###############
@@ -41,8 +41,9 @@ use_logic <- permits$use %in% c("1 family dwelling", "2 family dwelling", "apart
 status_logic <- permits$status %in% c("issued", "complete", "filed")
 permits_subset <- permits[use_logic & status_logic & !is.na(permits$issued_date), ]
 
-permits <- permits_subset
 
+permits <- permits_subset
+permits$issued_month <- lubridate::floor_date(permits$issued_date, unit="month")
 
 # Save the data
 

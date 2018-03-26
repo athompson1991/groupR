@@ -31,13 +31,6 @@ drop_df <- function(groupr, groups){
   return(out)
 }
 
-########################################################################################
-
-
-#' Make every combination of character vector
-#' @param n Maximum rows per combination data frame
-#' @param char_vec Character vector to be used
-#' @return A list of data frames with every column a unique combination of the given character vector
 get_combinations <- function(n, char_vec){
   full_list <- list()
   for(i in 1:n){
@@ -104,10 +97,6 @@ extract_drop_util <- function(groupr, groups, return_type){
   return(return_this)
 }
 
-#'
-#'
-#'
-#'
 subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- lapply(groupr[-1], function(level){
     if(type == "intersect")
@@ -126,4 +115,15 @@ subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- reassign_overall_df(groupr, worked_on)
   worked_on <- as.groupr(worked_on)
   return(worked_on)
+}
+
+relabel_values <- function(df, column, mapping){
+  from = names(mapping)
+  to = mapping
+  for(i in 1:length(mapping)){
+    new_value = to[i]
+    old_value = from[i]
+    df[df[ ,column] == old_value, column] <- new_value
+  }
+  return(df)
 }

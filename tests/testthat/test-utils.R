@@ -62,8 +62,19 @@ test_that("subset works", {
 
   # except intersect
 
-  expect_identical(subset(test_groupr, "color", type="except_intersect")[[2]], test_groupr[[2]][c(1,2)])
-  expect_identical(subset(test_groupr, "color", type="except_intersect")[[3]], test_groupr[[3]][c(1)])
-  expect_identical(subset(test_groupr, "color", type="except_intersect")[[4]], test_groupr[[4]][c(-1)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_intersect")[[2]], test_groupr[[2]][c(1,2,3)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_intersect")[[3]], test_groupr[[3]][c(1,3)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_intersect")[[4]], test_groupr[[4]][c(-1)])
 
+  # except union
+
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_union")[[2]], test_groupr[[2]][c(2)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_union")[[3]], test_groupr[[3]][-c(1,2,3)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="except_union")[[4]], test_groupr[[4]][-c(1,2,3)])
+
+})
+
+test_that("relabel_values", {
+  mapping <- c("Joe"="Guy", "Bob"="Guy", "Janet"="Gal", "Heather"="Gal", "John"="Guy", "Winston"="Guy", "Melissa"="Gal", "Monica"="Gal")
+  expect_identical(relabel_values(main_df, column="name",mapping=mapping)$name, c("Guy", "Guy", "Gal", "Gal", "Guy", "Guy", "Gal", "Gal"))
 })
