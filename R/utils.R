@@ -114,6 +114,12 @@ subset.groupr <- function(groupr, groups, type = "intersect"){
       return_dfs <- sapply(level, function(df) all(groups %in% colnames(df)))
     else if(type == "union")
       return_dfs <- sapply(level, function(df) any(groups %in% colnames(df)))
+    else if(type == "except_intersect")
+      return_dfs <- sapply(level, function(df) !all(groups %in% colnames(df)))
+    else if(type == "except_union")
+      return_dfs <- sapply(level, function(df) !any(groups %in% colnames(df)))
+    else
+      stop("Bad type, must be intersect, union, except_intersect, or except_union")
     fixed_level <- level[return_dfs]
     return(fixed_level)
   })

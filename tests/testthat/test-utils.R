@@ -42,3 +42,28 @@ test_that("drop dataframe returns correctly", {
   expect_warning(warn_drop <- drop_df(groupr = test_groupr, groups = c("company", "potato")), "Not in data: potato")
   expect_identical(test_groupr$n_1_group[-1], warn_drop$n_1_group)
 })
+
+test_that("subset works", {
+  expect_identical(subset(test_groupr, "color")[[2]], test_groupr[[2]][-c(1, 2)])
+  expect_identical(subset(test_groupr, "color")[[3]], test_groupr[[3]][-c(1)])
+  expect_identical(subset(test_groupr, "color")[[4]], test_groupr[[4]])
+
+  # intersect
+
+  expect_identical(subset(test_groupr, c("color", "company"))[[2]], test_groupr[[2]][-c(1,2,3)])
+  expect_identical(subset(test_groupr, c("color", "company"))[[3]], test_groupr[[3]][-c(1,3)])
+  expect_identical(subset(test_groupr, c("color", "company"))[[4]], test_groupr[[4]])
+
+  # union
+
+  expect_identical(subset(test_groupr, c("color", "company"), type="union")[[2]], test_groupr[[2]][-c(2)])
+  expect_identical(subset(test_groupr, c("color", "company"), type="union")[[3]], test_groupr[[3]])
+  expect_identical(subset(test_groupr, c("color", "company"), type="union")[[4]], test_groupr[[4]])
+
+  # except intersect
+
+  expect_identical(subset(test_groupr, "color", type="except_intersect")[[2]], test_groupr[[2]][c(1,2)])
+  expect_identical(subset(test_groupr, "color", type="except_intersect")[[3]], test_groupr[[3]][c(1)])
+  expect_identical(subset(test_groupr, "color", type="except_intersect")[[4]], test_groupr[[4]][c(-1)])
+
+})
