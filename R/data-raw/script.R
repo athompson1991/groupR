@@ -27,7 +27,24 @@ time_df <- cbind(expand.grid(companies, states, department, dates), budget)
 names(time_df) <- c("companies", "states", "department", "dates", "budget")
 
 
+###############
+# Kaggle Data #
+###############
 
-devtools::use_data(main_df, grouping_obj, time_df, internal = T, overwrite = T)
+raw_download_data <- read.csv("~/.kaggle/datasets/aparnashastry/building-permit-applications-data/Building_Permits.csv")
+permits <- raw_download_data[ ,c("Permit.Number", "Permit.Type", "Permit.Type.Definition", "Current.Status", "Current.Status.Date", "Issued.Date", "Neighborhoods...Analysis.Boundaries", "Existing.Use")]
+permits <- unique(permits)
+colnames(permits) <- c("permit_number", "type", "type_desc", "status", "status_date", "issued_date", "location", "use")
+permits$issued_date <- as.Date(permits$issued_date, "%m/%d/%Y")
+permits$status_date <- as.Date(permits$status_date, "%m/%d/%Y")
+use_logic <- permits$use %in% c("1 family dwelling", "2 family dwelling", "apartments", "office", "retail sales", "food/beverage hndlng")
+status_logic <- permits$status %in% c("issued", "complete", "filed")
+permits_subset <- permits[use_logic & status_logic & !is.na(permits$issued_date), ]
+
+permits <- permits_subset
+
+
+# Save the data
+
+devtools::use_data(main_df, permits, time_df, internal = T, overwrite = T)
 rm(list = ls())
-

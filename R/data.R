@@ -1,39 +1,17 @@
-#' Batting data for MLB teams.
+#' Building permits for San Francisco (From Kaggle.com, user Aparna Shasty)
 #'
-#' Team batting statistics at the player level. Data pulled on 2017-12-14.
+#' This dataset pertains to all types of structural permits from Jan 1, 2013-Feb 25th 2018.
 #'
-#' @format A data frame with 1494 rows and 31 columns
+#' @format a data frame with 7 columns and 118837 rows
 #' \describe{
-#'    \item{league}{American League or National League}
-#'    \item{division}{East, Central, or West}
-#'    \item{team}{Team name}
-#'    \item{Pos}{Player position}
-#'    \item{Name}{Player name}
-#'    \item{Age}{Player’s age at midnight of June 30th of that year}
-#'    \item{G}{Games Played or Pitched}
-#'    \item{PA}{Plate Appearances}
-#'    \item{AB}{At Bats}
-#'    \item{R}{Runs Scored}
-#'    \item{H}{Hits}
-#'    \item{2B}{Doubles}
-#'    \item{3B}{Triples}
-#'    \item{HR}{Home Runs}
-#'    \item{RBI}{Runs Batted In}
-#'    \item{SB}{Stolen Bases}
-#'    \item{CS}{Caught Stealing}
-#'    \item{BB}{Bases on Balls}
-#'    \item{SO}{Strikeouts}
-#'    \item{BA}{Batting Average}
-#'    \item{OBP}{On-Base Percentage}
-#'    \item{SLG}{Slugging Percentage}
-#'    \item{OPS}{On-Base Plus Slugging}
-#'    \item{OPS_adj}{Adjusted OPS+}
-#'    \item{TB}{Total Bases}
-#'    \item{GDP}{Double Plays Grounded Into}
-#'    \item{HBP}{Hit By Pitch}
-#'    \item{SH}{Sacrifice Hits}
-#'    \item{SF}{Sacrifice Flies}
-#'    \item{IBB}{Intentional Bases on Balls}
+#' \item{permit_number}{Unique key to identify building permit}
+#' \item{type}{Numeric value to identify type}
+#' \item{type_desc{Description for type}
+#' \item{status}{Status of permit}
+#' \item{status_date}{Date "as of" status}
+#' \item{issued_date}{When the permit was issued}
+#' \item{location}{Which neighborhood it was issued for in San Francisoco}
+#' \item{use}{Existing use of the building}
 #' }
-#' @source \url{https://www.baseball-reference.com}
-"baseball"
+#' @source \url{https://www.kaggle.com/aparnashastry/building-permit-applications-data/data}
+"permits"
