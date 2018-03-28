@@ -3,7 +3,6 @@
 #' This function takes a data frame as input and returns a grouping object as output. The grouping object is a list of lists of data frames, one data frame for every possible combination of groups.
 #' For example, if there are two groups, A and B, four data frames are returned: data frames for A, B, both A and B, and a data frame summarizing the whole dataset.
 #'
-#'
 #' @export
 #' @param df A data frame of raw data.
 #' @param groups A character vector of column names in df that will be basis for aggregation.
@@ -15,9 +14,9 @@
 #'                            , my_group2 = c(rep("foo", 2), rep("bar", 2), rep("baz", 2), rep("potato", 2))
 #'                            , my_data = runif(n = 8)
 #'                           )
-#' grouping_obj <- get_groups(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
+#' grouping_obj <- (df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
 #' print(grouping_obj)
-get_groups <- function(df, groups, functions = list("count" = "n()"), depth = length(groups)){
+groupr <- function(df, groups, functions = list("count" = "n()"), depth = length(groups)){
   group_combinations <- get_combinations(depth, groups)
   function_count <- length(functions)
   column_names <- names(functions)
@@ -62,13 +61,18 @@ dplyr_loop <- function(in_df, functions, selection){
 
 #' Perform function(s) on grouping object.
 #'
+#' Given a metric calculated using a \code{groupr} object, one could need to perform additional analysis using the data produced.
+#' For example, a \code{groupr} object could be used to count the number of employees in an organization and get their total tenure,
+#' as broken out by various groups (state, full/part time, etc.). A natural, additional calculation could be an total tenure divided by count, applied
+#' to all the resultant data frames. This function is generalized so that any function with one argument (\code{df}) can be passed.
+#'
 #' @export
 #' @importFrom magrittr "%>%"
-#' @param groupr A grouping object created with the \code{get_groups} function
+#' @param groupr A grouping object created with the \code{} function
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
-#' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})
+#' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{groupr})
 #' @examples
-#' groupr <- get_groups(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
+#' groupr <- (permits, groups = c("type_desc", "issued_date", "existing_const_type"))
 #' extract_df(groupr, "existing_const_type")
 #' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 #' extract_df(applied_groupr, "existing_const_type")

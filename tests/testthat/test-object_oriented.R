@@ -2,7 +2,7 @@ context("Object oriented")
 
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
 
-test_groupr <- get_groups(
+test_groupr <- groupr(
   df = main_df,
   groups = c("company", "party", "color"),
   functions = function_list

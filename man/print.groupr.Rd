@@ -7,7 +7,7 @@
 \method{print}{groupr}(groupr_obj, include_colnames = F)
 }
 \arguments{
-\item{groupr_obj}{A grouping object created with \code{get_groups}}
+\item{groupr_obj}{A grouping object created with \code{groupr}}
 
 \item{include_colnames}{Boolean for whether or not to print colnames in tree}
 }
@@ -15,6 +15,6 @@
 Print a groupr object as tree.
 }
 \examples{
-groupr <- get_groups(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+groupr <- groupr(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
 print(groupr)
 }

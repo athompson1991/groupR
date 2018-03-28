@@ -7,18 +7,21 @@
 group_obj_apply(groupr, new_functions, is_cbind = F)
 }
 \arguments{
-\item{groupr}{A grouping object created with the \code{get_groups} function}
+\item{groupr}{A grouping object created with the \code{} function}
 
 \item{new_functions}{A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.}
 
-\item{is_cbind}{Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})}
+\item{is_cbind}{Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{groupr})}
 }
 \description{
-Perform function(s) on grouping object.
+Given a metric calculated using a \code{groupr} object, one could need to perform additional analysis using the data produced.
+For example, a \code{groupr} object could be used to count the number of employees in an organization and get their total tenure,
+as broken out by various groups (state, full/part time, etc.). A natural, additional calculation could be an total tenure divided by count, applied
+to all the resultant data frames. This function is generalized so that any function with one argument (\code{df}) can be passed.
 }
 \examples{
-groupr <- get_groups(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
-extract_df(groupr, "existing_const_type")
-applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
+permits_groupr <- groupr(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
+extract_df(permits_groupr, "existing_const_type")
+applied_groupr <- group_obj_apply(permits_groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 extract_df(applied_groupr, "existing_const_type")
 }

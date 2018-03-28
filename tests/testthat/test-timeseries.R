@@ -2,7 +2,7 @@ context("Time series")
 
 bad_names <- c("company a", "company b", "company c")
 
-time_groupr <- get_groups(
+time_groupr <- groupr(
   time_df,
   groups = c("companies", "states", "department", "dates"),
   functions = list(avg_budget = "mean(budget)")

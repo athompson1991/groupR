@@ -7,7 +7,7 @@
 extract_xts(groupr, value_choice, date_column = "dd_dt")
 }
 \arguments{
-\item{groupr}{Grouping object created with \code{get_groups}}
+\item{groupr}{Grouping object created with \code{groupr}}
 
 \item{value_choice}{The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.}
 
@@ -20,6 +20,6 @@ An \code{xts_groupr} object with the date column cast against the groups column,
 Extracts time series data from grouping object.
 }
 \examples{
-permits_groupr <- get_groups(permits, groups = c("issued_month", "existing_const_type"))
+permits_groupr <- groupr(permits, groups = c("issued_month", "existing_const_type"))
 permits_xts <- extract_xts(permits_groupr, value_choice = "count", date_column = "issued_month")
 }

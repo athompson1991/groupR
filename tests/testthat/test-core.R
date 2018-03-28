@@ -2,19 +2,19 @@ context("Core")
 
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
 
-test_groupr <- get_groups(
+test_groupr <- groupr(
   df = main_df,
   groups = c("company", "party", "color"),
   functions = function_list
 )
 
-two_levels <- get_groups(df = main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"), depth = 2)
+two_levels <- groupr(df = main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"), depth = 2)
 
 simple_function <- function(df) df$avg_salary / df$max_salary
 new_functions <- list(percent_calc = simple_function)
 applied_obj <- group_obj_apply(test_groupr, new_functions = new_functions, is_cbind = T)
 
-test_that("get_groups returns proper list", {
+test_that("groupr returns proper list", {
   expect_equal(names(test_groupr), c("n_0_group", "n_1_group", "n_2_group", "n_3_group"))
   expect_equal(names(test_groupr$n_1_group), c("company", "party", "color"))
   expect_equal(names(test_groupr$n_2_group), c("company...party", "company...color", "party...color"))

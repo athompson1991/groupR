@@ -1,12 +1,12 @@
 #' Extracts time series data from grouping object.
 #'
 #' @export
-#' @param groupr Grouping object created with \code{get_groups}
+#' @param groupr Grouping object created with \code{groupr}
 #' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
 #' @param date_column The column with date data which will represent unique index for the returned \code{xts}
 #' @return An \code{xts_groupr} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #' @examples
-#' permits_groupr <- get_groups(permits, groups = c("issued_month", "existing_const_type"))
+#' permits_groupr <- groupr(permits, groups = c("issued_month", "existing_const_type"))
 #' permits_xts <- extract_xts(permits_groupr, value_choice = "count", date_column = "issued_month")
 extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
   groups <- names(groupr$n_1_group)

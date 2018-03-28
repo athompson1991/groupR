@@ -21,7 +21,7 @@ drop_grouping_level <- function(groupr, group_level){
 #' @return Will extract he desired observation, a single dataframe or \code{xts} object and return it,
 #' or drop that single observation and return the groupr object without it.
 #' @examples
-#' groupr <- get_groups(permits, groups = c("issued_month", "status", "location", "existing_use"))
+#' groupr <- groupr(permits, groups = c("issued_month", "status", "location", "existing_use"))
 #' extract_df(groupr, "status")
 #' extract_df(groupr, c("existing_use", "status"))
 extract_df <- function(groupr, groups){

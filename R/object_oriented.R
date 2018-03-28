@@ -7,10 +7,10 @@ as.xts_groupr <- function(in_list) structure(in_list, class=c("xts_groupr", "gro
 #' Print a groupr object as tree.
 #'
 #' @export
-#' @param groupr_obj A grouping object created with \code{get_groups}
+#' @param groupr_obj A grouping object created with \code{groupr}
 #' @param include_colnames Boolean for whether or not to print colnames in tree
 #' @examples
-#' groupr <- get_groups(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+#' groupr <- groupr(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
 #' print(groupr)
 print.groupr <- function(groupr_obj, include_colnames = F){
   groups <- names(groupr_obj$n_1_group)
