@@ -45,29 +45,49 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
   return(out)
 }
 
-do_modeling <- function(z_data, is_auto_arima = F, ...){
-  z_ind   <- as.Date(names(z_data))
-  z_yr    <- lubridate::year(xts::first(z_ind))
-  z_mth   <- lubridate::month(xts::first(z_ind))
-  ts_data <- stats::ts(z_data, frequency = 12, start = c(z_yr, z_mth))
-
-  if(is_auto_arima){
-    temp_model <- forecast::auto.arima(ts_data)
-  }else{
-    temp_model <- forecast::Arima(ts_data, ...)
-  }
-  temp_model
-}
-
 #' Models time series list with an ARIMA model.
 #'
 #' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
 #' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
 #' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
 #'
-xts_to_arima_model <- function(xts_gr_obj, ..., is_auto_arima){
-  arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima)
-  group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+xts_to_arima_model <- function(xts_gr_obj,  ..., is_auto_arima=T, parallelize=F, interval="month"){
+  if(parallelize){
+    core_count <- parallel::detectCores()-1
+    cl <- parallel::makeCluster(core_count)
+    arima_mdls <- function(df) parallel::parApply(cl, df, 2, FUN = do_modeling, ...=..., is_auto_arima=is_auto_arima, interval=interval)
+  }
+  else
+    arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima, interval=interval)
+  out <- group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+  if(parallelize)
+    parallel::stopCluster(cl)
+  return(out)
+}
+
+do_modeling <- function(xts_column, is_auto_arima = F, interval, ...){
+  index   <- as.Date(names(xts_column))
+  index_year    <- lubridate::year(xts::first(index))
+  index_month   <- lubridate::month(xts::first(index))
+  index_day     <- lubridate::day(xts::first(index))
+
+  if(interval == "month")
+    ts_data <- stats::ts(xts_column, frequency = 12, start = c(index_year, index_month))
+  else if(interval == "week")
+    ts_data <- stats::ts(xts_column, frequency = 52)
+  else if(interval == "day")
+    ts_data <- stats::ts(xts_column, frequency = 7)
+  else if(is.numeric(interval))
+    ts_data <- stats::ts(xts_column, frequency = interval)
+  else
+    stop("Bad interval choice")
+
+  if(is_auto_arima)
+    model <- forecast::auto.arima(ts_data)
+  else
+    model <- forecast::Arima(y = ts_data, ...)
+
+  model
 }
 
 clean_extracted_groupr <- function(groupr){
