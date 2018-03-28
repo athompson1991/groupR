@@ -4,7 +4,8 @@
 \alias{xts_to_arima_model}
 \title{Models time series list with an ARIMA model.}
 \usage{
-xts_to_arima_model(xts_gr_obj, ..., is_auto_arima)
+xts_to_arima_model(xts_gr_obj, ..., is_auto_arima = T, parallelize = F,
+  interval = "month")
 }
 \arguments{
 \item{xts_gr_obj}{A list of \code{xts} data produced with \code{extract_xts}.}

@@ -15,6 +15,7 @@
 #'                            , my_data = runif(n = 8)
 #'                           )
 #' grouping_obj <- get_groups(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
+#' print(grouping_obj)
 get_groups <- function(df, groups, functions = list("count" = "n()"), depth = length(groups)){
   group_combinations <- get_combinations(depth, groups)
   function_count <- length(functions)
@@ -62,13 +63,21 @@ dplyr_loop <- function(in_df, functions, selection){
 #'
 #' @export
 #' @importFrom magrittr "%>%"
-#' @param group_obj A grouping object created with the \code{get_groups} function
+#' @param groupr A grouping object created with the \code{get_groups} function
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
 #' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})
-#'
-group_obj_apply <- function(group_obj, new_functions, is_cbind = F){
+#' @examples
+#' groupr <- get_groups(permits_clean, groups = c("type_desc", "issued_date", "existing_const_type"))
+#' extract_df(groupr, "existing_const_type")
+#' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind=T)
+#' extract_df(applied_groupr, "existing_const_type")
+group_obj_apply <- function(groupr, new_functions, is_cbind = F){
   raw_names <- names(new_functions)
-  out <- lapply(group_obj, function(df_list){
+
+  if(is.null(names(new_functions)))
+    stop("Functions must be named")
+
+  out <- lapply(groupr, function(df_list){
     lapply(df_list, function(df){
       if(!is.null(ncol(df))){
         new_data_ls <- lapply(new_functions, function(f){

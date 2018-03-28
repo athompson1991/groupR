@@ -15,7 +15,6 @@
 Print a groupr object as tree.
 }
 \examples{
-bball_groupr <- get_groups(baseball, groups = c("league", "team"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
-print(bball_groupr)
-print(bball_groupr, include_colnames = TRUE)
+groupr <- get_groups(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+print(groupr)
 }

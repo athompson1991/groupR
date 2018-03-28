@@ -27,4 +27,5 @@ default_data <- data.frame(  my_group1 = c(rep("A", 4), rep("B", 4))
                            , my_data = runif(n = 8)
                           )
 grouping_obj <- get_groups(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
+print(grouping_obj)
 }

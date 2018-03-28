@@ -1,6 +1,6 @@
 is.groupr <- function(x) inherits(x, "groupr")
 as.groupr <- function(in_list) structure(in_list, class="groupr")
-as.xts_groupr <- function(in_list) structure(in_list, class=c("xts_groupr", "groupr")))
+as.xts_groupr <- function(in_list) structure(in_list, class=c("xts_groupr", "groupr"))
 
 #' Printing groupr objects
 #'

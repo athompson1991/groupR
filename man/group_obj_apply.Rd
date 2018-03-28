@@ -4,10 +4,10 @@
 \alias{group_obj_apply}
 \title{Perform function(s) on grouping object.}
 \usage{
-group_obj_apply(group_obj, new_functions, is_cbind = F)
+group_obj_apply(groupr, new_functions, is_cbind = F)
 }
 \arguments{
-\item{group_obj}{A grouping object created with the \code{get_groups} function}
+\item{groupr}{A grouping object created with the \code{get_groups} function}
 
 \item{new_functions}{A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.}
 
@@ -15,4 +15,10 @@ group_obj_apply(group_obj, new_functions, is_cbind = F)
 }
 \description{
 Perform function(s) on grouping object.
+}
+\examples{
+groupr <- get_groups(permits_clean, groups = c("type_desc", "issued_date", "existing_const_type"))
+extract_df(groupr, "existing_const_type")
+applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind=T)
+extract_df(applied_groupr, "existing_const_type")
 }

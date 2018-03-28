@@ -47,6 +47,7 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
 
 #' Models time series list with an ARIMA model.
 #'
+#' @export
 #' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
 #' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
 #' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.

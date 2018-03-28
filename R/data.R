@@ -2,11 +2,11 @@
 #'
 #' This dataset pertains to all types of structural permits from Jan 1, 2013-Feb 25th 2018.
 #'
-#' @format a data frame with 7 columns and 118837 rows
+#' @format a data frame with 7 columns
 #' \describe{
 #' \item{permit_number}{Unique key to identify building permit}
 #' \item{type}{Numeric value to identify type}
-#' \item{type_desc{Description for type}
+#' \item{type_desc}{Description for type}
 #' \item{status}{Status of permit}
 #' \item{status_date}{Date "as of" status}
 #' \item{issued_date}{When the permit was issued}
