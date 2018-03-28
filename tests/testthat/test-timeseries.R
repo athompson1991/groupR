@@ -14,16 +14,6 @@ extracted_groupr <- extract_xts(
   date_col = "dates"
 )
 
-congress_groupr <- get_groups(df = tail(rollcalls, 1000), groups = c("first_of_month", "congress", "chamber", "vote_result"))
-congress_xts <- extract_xts(groupr = congress_groupr, value_choice = "count", date_column = "first_of_month")
-
-test_that("new_xts_names works in a sensible manner", {
-  expect_identical(new_xts_names(congress_groupr$n_2_group$first_of_month...chamber, "chamber"), c("senate", "house"))
-  expect_identical(new_xts_names(congress_groupr$n_2_group$first_of_month...congress, "congress"), c("114", "115"))
-  expect_identical(new_xts_names(congress_groupr$n_3_group$first_of_month...congress...chamber, c("congress", "chamber")),
-                   c("114/senate", "115/house", "115/senate"))
-})
-
 test_that("extract_xts gives right group level names", {
   expect_identical(names(extracted_groupr), c("n_0_group", "n_1_group", "n_2_group", "n_3_group"))
   expect_identical(names(extracted_groupr$n_0_group), "overall")
@@ -56,8 +46,6 @@ test_that("extract_xts gives right xts names", {
       "company_c/ca"
     )
   )
-
-
 })
 
 test_that("values are correct", {

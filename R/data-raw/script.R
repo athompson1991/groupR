@@ -31,21 +31,20 @@ names(time_df) <- c("companies", "states", "department", "dates", "budget")
 # Kaggle Data #
 ###############
 
-raw_download_data <- read.csv("~/.kaggle/datasets/aparnashastry/building-permit-applications-data/Building_Permits.csv")
-permits <- raw_download_data[ ,c("Permit.Number", "Permit.Type", "Permit.Type.Definition", "Current.Status", "Current.Status.Date", "Issued.Date", "Neighborhoods...Analysis.Boundaries", "Existing.Use")]
-permits <- unique(permits)
-colnames(permits) <- c("permit_number", "type", "type_desc", "status", "status_date", "issued_date", "location", "use")
+raw_download_data <- read.csv("~/.kaggle/datasets/aparnashastry/building-permit-applications-data/Building_Permits.csv", stringsAsFactors = F)
+permits <- raw_download_data[ ,c("Permit.Number", "Permit.Type", "Permit.Type.Definition", "Current.Status", "Current.Status.Date", "Issued.Date", "Neighborhoods...Analysis.Boundaries", "Existing.Use", "Existing.Construction.Type.Description")]
+permits <- permits[-(which(duplicated(permits$Permit.Number))), ]
+colnames(permits) <- c("permit_number", "type", "type_desc", "status", "status_date", "issued_date", "location", "existing_use", "existing_const_type")
 permits$issued_date <- as.Date(permits$issued_date, "%m/%d/%Y")
 permits$status_date <- as.Date(permits$status_date, "%m/%d/%Y")
-use_logic <- permits$use %in% c("1 family dwelling", "2 family dwelling", "apartments", "office", "retail sales", "food/beverage hndlng")
-status_logic <- permits$status %in% c("issued", "complete", "filed")
-permits_subset <- permits[use_logic & status_logic & !is.na(permits$issued_date), ]
-
-
-permits <- permits_subset
+permits <- permits[!is.na(permits$issued_date), ]
 permits$issued_month <- lubridate::floor_date(permits$issued_date, unit="month")
+permits$existing_use[permits$existing_use==''] <- NA
+permits <- permits[!is.na(permits$existing_use), ]
+
 
 # Save the data
 
-devtools::use_data(main_df, permits, time_df, internal = T, overwrite = T)
+devtools::use_data(main_df, time_df, internal = T, overwrite = T)
+devtools::use_data(permits, overwrite=T, compress="bzip2")
 rm(list = ls())

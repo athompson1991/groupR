@@ -117,13 +117,21 @@ subset.groupr <- function(groupr, groups, type = "intersect"){
   return(worked_on)
 }
 
-relabel_values <- function(df, column, mapping){
-  from = names(mapping)
-  to = mapping
-  for(i in 1:length(mapping)){
-    new_value = to[i]
-    old_value = from[i]
-    df[df[ ,column] == old_value, column] <- new_value
+other_label <- function(df, column, percentile=0.9, custom=NULL){
+  work_vector <- df[ ,column]
+  if(is.character(work_vector))
+    work_vector <- as.factor(work_vector)
+
+  if(is.null(custom)){
+    counts <- summary(work_vector)
+    ordered_counts <- counts[order(counts, decreasing=T)]
+    pct_contrib <- ordered_counts/sum(ordered_counts)
+    pct_cumsum <- cumsum(pct_contrib)
+    rename_these <- names(which(pct_cumsum > percentile))
+  } else {
+    rename_these = custom
   }
+  relabelled_vector <- plyr::mapvalues(df[ ,column], from=rename_these, to=rep("other", length(rename_these)))
+  df[ ,column] <- relabelled_vector
   return(df)
 }

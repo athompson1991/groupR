@@ -74,7 +74,9 @@ test_that("subset works", {
 
 })
 
-test_that("relabel_values", {
-  mapping <- c("Joe"="Guy", "Bob"="Guy", "Janet"="Gal", "Heather"="Gal", "John"="Guy", "Winston"="Guy", "Melissa"="Gal", "Monica"="Gal")
-  expect_identical(relabel_values(main_df, column="name",mapping=mapping)$name, c("Guy", "Guy", "Gal", "Gal", "Guy", "Guy", "Gal", "Gal"))
+test_that("auto_other_label works", {
+  renamed_df <- other_label(permits, "existing_use", percentile = 0.9)
+  expect_equal(sort(unique(renamed_df$existing_use)), c("1 family dwelling", "2 family dwelling", "apartments", "office", "other", "retail sales"))
+  renamed_df <- other_label(permits, "status", custom=c("approved", "expired", "incomplete", "expired", "reinstated", "revoked", "suspend", "withdrawn"))
+  expect_equal(sort(unique(renamed_df$status)), c("cancelled", "complete", "issued", "other"))
 })
