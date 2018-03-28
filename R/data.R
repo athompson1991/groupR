@@ -11,7 +11,9 @@
 #' \item{status_date}{Date "as of" status}
 #' \item{issued_date}{When the permit was issued}
 #' \item{location}{Which neighborhood it was issued for in San Francisoco}
-#' \item{use}{Existing use of the building}
+#' \item{existing_use}{Existing use of the building}
+#' \item{existing_const_type}{Existing construction type}
+#' \item{issued_month}{The issued month. Simply the date floor as calculated with \code{lubridate::floor_date(permits$issued_date, unit="month")}}
 #' }
 #' @source \url{https://www.kaggle.com/aparnashastry/building-permit-applications-data/data}
 "permits"
