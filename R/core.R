@@ -14,8 +14,8 @@
 #'                            , my_group2 = c(rep("foo", 2), rep("bar", 2), rep("baz", 2), rep("potato", 2))
 #'                            , my_data = runif(n = 8)
 #'                           )
-#' grouping_obj <- (df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
-#' print(grouping_obj)
+#' groupr_object <- groupr(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
+#' print(groupr_object)
 groupr <- function(df, groups, functions = list("count" = "n()"), depth = length(groups)){
   group_combinations <- get_combinations(depth, groups)
   function_count <- length(functions)
@@ -72,9 +72,9 @@ dplyr_loop <- function(in_df, functions, selection){
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
 #' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{groupr})
 #' @examples
-#' groupr <- (permits, groups = c("type_desc", "issued_date", "existing_const_type"))
-#' extract_df(groupr, "existing_const_type")
-#' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
+#' permits_groupr <- groupr(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
+#' extract_df(permits_groupr, "existing_const_type")
+#' applied_groupr <- group_obj_apply(permits_groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 #' extract_df(applied_groupr, "existing_const_type")
 group_obj_apply <- function(groupr, new_functions, is_cbind = F){
   raw_names <- names(new_functions)
