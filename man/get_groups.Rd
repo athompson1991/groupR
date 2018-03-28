@@ -2,7 +2,7 @@
 % Please edit documentation in R/core.R
 \name{get_groups}
 \alias{get_groups}
-\title{Create grouping object.}
+\title{Create groupr object.}
 \usage{
 get_groups(df, groups, functions = list(count = "n()"),
   depth = length(groups))
@@ -13,6 +13,8 @@ get_groups(df, groups, functions = list(count = "n()"),
 \item{groups}{A character vector of column names in df that will be basis for aggregation.}
 
 \item{functions}{A named list of functions for aggregation.}
+
+\item{depth}{How far down the tree the combinations should work out.}
 }
 \value{
 A grouping object (list that aggregates functions by every potential combination)

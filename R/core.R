@@ -1,4 +1,4 @@
-#' Create grouping object.
+#' Create groupr object.
 #'
 #' This function takes a data frame as input and returns a grouping object as output. The grouping object is a list of lists of data frames, one data frame for every possible combination of groups.
 #' For example, if there are two groups, A and B, four data frames are returned: data frames for A, B, both A and B, and a data frame summarizing the whole dataset.
@@ -8,6 +8,7 @@
 #' @param df A data frame of raw data.
 #' @param groups A character vector of column names in df that will be basis for aggregation.
 #' @param functions A named list of functions for aggregation.
+#' @param depth How far down the tree the combinations should work out.
 #' @return A grouping object (list that aggregates functions by every potential combination)
 #' @examples
 #' default_data <- data.frame(  my_group1 = c(rep("A", 4), rep("B", 4))
@@ -69,7 +70,7 @@ dplyr_loop <- function(in_df, functions, selection){
 #' @examples
 #' groupr <- get_groups(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
 #' extract_df(groupr, "existing_const_type")
-#' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind=T)
+#' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 #' extract_df(applied_groupr, "existing_const_type")
 group_obj_apply <- function(groupr, new_functions, is_cbind = F){
   raw_names <- names(new_functions)

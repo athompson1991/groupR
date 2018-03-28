@@ -19,6 +19,6 @@ Perform function(s) on grouping object.
 \examples{
 groupr <- get_groups(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
 extract_df(groupr, "existing_const_type")
-applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind=T)
+applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 extract_df(applied_groupr, "existing_const_type")
 }

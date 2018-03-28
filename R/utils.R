@@ -21,9 +21,9 @@ drop_grouping_level <- function(groupr, group_level){
 #' @return Will extract he desired observation, a single dataframe or \code{xts} object and return it,
 #' or drop that single observation and return the groupr object without it.
 #' @examples
-#' groupr <- get_groups(main_df, groups = c("company", "party", "color"))
-#' extract_df(groupr, "color")
-#' extract_df(groupr, c("color", "party"))
+#' groupr <- get_groups(permits, groups = c("issued_month", "status", "location", "existing_use"))
+#' extract_df(groupr, "status")
+#' extract_df(groupr, c("existing_use", "status"))
 extract_df <- function(groupr, groups){
   out <- extract_drop_util(groupr = groupr, groups, return_type="extract")
   return(out)
@@ -122,6 +122,26 @@ subset.groupr <- function(groupr, groups, type = "intersect"){
   return(worked_on)
 }
 
+
+#' Automatically assign "other" to low observation count grouping values
+#'
+#' Often times, a dataset will have groups which are distributed
+#' somewhat exponentially - almost all rows fall into a few group values, but there are many smaller group values for
+#' the remaining observations. For example, you may have a dataset with employee level observations and want to use
+#' "US State" as a group, but 90\% of the observations fall into New York, California, Texas, and perhaps 6 other states.
+#' All remaining observations are distributed amongst the remaining 41 states, but you might prefer to lump all of those
+#' observations into a single bucket. This functions provides a way to reassign all those observations to "other".
+#'
+#' @export
+#' @param df The dataframe to be manipulated
+#' @param column Which column to relabel
+#' @param percentile Which percentage to cut off the data at
+#' @param custom A custom vector of values to reassign to "other" in the dataset
+#' @return The dataframe with reassigned column
+#' @examples
+#' summary(as.factor(permits$type_desc))
+#' permits_cleaned <- other_label(permits, "type_desc")
+#' summary(as.factor(permits_cleaned$type_desc))
 other_label <- function(df, column, percentile=0.9, custom=NULL){
   work_vector <- df[ ,column]
   if(is.character(work_vector))

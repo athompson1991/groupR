@@ -2,10 +2,9 @@
 #'
 #' @export
 #' @param groupr Grouping object created with \code{get_groups}
-#' @param groups Groups that will be converted to time series data (\code{xts} object)
 #' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
-#' @param date_col The column with date data which will represent unique index for the returned \code{xts}
-#' @return An \code{xts} object with the date column cast against the groups column, using \code{sum} to summarize the value column
+#' @param date_column The column with date data which will represent unique index for the returned \code{xts}
+#' @return An \code{xts_groupr} object with the date column cast against the groups column, using \code{sum} to summarize the value column
 #' @examples
 #' permits_groupr <- get_groups(permits, groups = c("issued_month", "existing_const_type"))
 #' permits_xts <- extract_xts(permits_groupr, value_choice = "count", date_column = "issued_month")
@@ -53,7 +52,9 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
 #' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
 #' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
 #' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
-xts_to_arima_model <- function(xts_gr_obj,  ..., is_auto_arima=T, parallelize=F, interval="month"){
+#' @param parallelize Whether or not to use the \code{parallel} package to do calculations
+#' @param interval Either "month", "week", or "day" for calculation. Alternatively, you can provide a numeric value to be passed to \code{frequency} for the \code{ts} object.
+xts_to_arima_model <- function(xts_gr_obj,  ..., is_auto_arima = TRUE, parallelize = FALSE, interval="month"){
   if(parallelize){
     core_count <- parallel::detectCores()-1
     cl <- parallel::makeCluster(core_count)

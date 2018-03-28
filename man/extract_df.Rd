@@ -27,7 +27,7 @@ Pull a leaf from the \code{groupr} tree. This will typically return a dataframe 
 }}
 
 \examples{
-groupr <- get_groups(main_df, groups = c("company", "party", "color"))
-extract_df(groupr, "color")
-extract_df(groupr, c("color", "party"))
+groupr <- get_groups(permits, groups = c("issued_month", "status", "location", "existing_use"))
+extract_df(groupr, "status")
+extract_df(groupr, c("existing_use", "status"))
 }
