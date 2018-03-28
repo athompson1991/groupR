@@ -23,7 +23,7 @@ test_that("extract_xts gives right group level names", {
 })
 
 test_that("extract_xts gives right classes", {
-  expect_identical(class(extracted_groupr), "groupr")
+  expect_identical(class(extracted_groupr), c("xts_groupr", "groupr"))
   expect_identical(class(extracted_groupr$n_0_group), c("xts", "zoo"))
   expect_identical(class(extracted_groupr$n_1_group$companies), c("xts", "zoo"))
   expect_identical(class(extracted_groupr$n_1_group$states), c("xts", "zoo"))

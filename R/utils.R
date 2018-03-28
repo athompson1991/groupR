@@ -18,7 +18,12 @@ drop_grouping_level <- function(groupr, group_level){
 #' @export
 #' @param groupr The groupr object to pull from
 #' @param groups The desired groups
-#' @return The desired observation, typically a dataframe or \code{xts} object
+#' @return Will extract he desired observation, a single dataframe or \code{xts} object and return it,
+#' or drop that single observation and return the groupr object without it.
+#' @examples
+#' groupr <- get_groups(main_df, groups = c("company", "party", "color"))
+#' extract_df(groupr, "color")
+#' extract_df(groupr, c("color", "party"))
 extract_df <- function(groupr, groups){
   out <- extract_drop_util(groupr = groupr, groups, return_type="extract")
   return(out)

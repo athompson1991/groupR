@@ -21,3 +21,7 @@ An \code{xts} object with the date column cast against the groups column, using 
 \description{
 Extracts time series data from grouping object.
 }
+\examples{
+permits_groupr <- get_groups(permits, groups = c("issued_month", "existing_const_type"))
+permits_xts <- extract_xts(permits_groupr, value_choice = "count", date_column = "issued_month")
+}

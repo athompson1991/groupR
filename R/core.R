@@ -67,7 +67,7 @@ dplyr_loop <- function(in_df, functions, selection){
 #' @param new_functions A list of functions (each with one argument: \code{df}) to apply to the grouping object. The \code{df} argument will be the dataframe in the grouping object.
 #' @param is_cbind Boolean value for whether or not the functions applied should be added to the \code{df} passed, or if they should be returned as a list (with similar dimensions as the \code{group_obj})
 #' @examples
-#' groupr <- get_groups(permits_clean, groups = c("type_desc", "issued_date", "existing_const_type"))
+#' groupr <- get_groups(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
 #' extract_df(groupr, "existing_const_type")
 #' applied_groupr <- group_obj_apply(groupr, list(rounded = function(df) round(df$count, -3)), is_cbind=T)
 #' extract_df(applied_groupr, "existing_const_type")
