@@ -1,5 +1,6 @@
 is.groupr <- function(x) inherits(x, "groupr")
 as.groupr <- function(in_list) structure(in_list, class="groupr")
+as.xts_groupr <- function(in_list) structure(in_list, class=c("xts_groupr", "groupr")))
 
 #' Printing groupr objects
 #'
@@ -9,9 +10,8 @@ as.groupr <- function(in_list) structure(in_list, class="groupr")
 #' @param groupr_obj A grouping object created with \code{get_groups}
 #' @param include_colnames Boolean for whether or not to print colnames in tree
 #' @examples
-#' bball_groupr <- get_groups(baseball, groups = c("league", "team"), functions = list(toal_home_runs = "sum(HR, na.rm=T)", n="n()"))
-#' print(bball_groupr)
-#' print(bball_groupr, include_colnames = TRUE)
+#' groupr <- get_groups(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+#' print(groupr)
 print.groupr <- function(groupr_obj, include_colnames = F){
   groups <- names(groupr_obj$n_1_group)
 
