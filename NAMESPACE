@@ -3,7 +3,7 @@
 S3method(print,groupr)
 export(extract_df)
 export(extract_xts)
-export(group_obj_apply)
+export(gapply)
 export(groupr)
 export(other_label)
 export(xts_to_arima_model)

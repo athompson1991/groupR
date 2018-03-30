@@ -74,9 +74,9 @@ dplyr_loop <- function(in_df, functions, selection){
 #' @examples
 #' permits_groupr <- groupr(permits, groups = c("type_desc", "issued_date", "existing_const_type"))
 #' extract_df(permits_groupr, "existing_const_type")
-#' applied_groupr <- group_obj_apply(permits_groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
+#' applied_groupr <- gapply(permits_groupr, list(rounded = function(df) round(df$count, -3)), is_cbind = TRUE)
 #' extract_df(applied_groupr, "existing_const_type")
-group_obj_apply <- function(groupr, new_functions, is_cbind = F){
+gapply <- function(groupr, new_functions, is_cbind = F){
   raw_names <- names(new_functions)
 
   if(is.null(names(new_functions)))

@@ -62,7 +62,7 @@ xts_to_arima_model <- function(xts_gr_obj,  ..., is_auto_arima = TRUE, paralleli
   }
   else
     arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima, interval=interval)
-  out <- group_obj_apply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+  out <- gapply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
   if(parallelize)
     parallel::stopCluster(cl)
   return(out)
