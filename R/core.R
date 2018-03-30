@@ -87,21 +87,13 @@ gapply <- function(groupr, new_functions, is_cbind = F){
       if(!is.null(ncol(df))){
         new_data_ls <- lapply(new_functions, function(f){
           temp_data <- do.call(f, list(df))
-          if(xts::is.xts(temp_data) | is.data.frame(temp_data)){
-            colnames(temp_data) <- paste(raw_names[i], colnames(temp_data), sep = "_")
-          }
           return(temp_data)
         })
 
         return_this <- NULL
         if(is_cbind){
-          if(xts::is.xts(df)){
-            new_data <- do.call(merge, new_data_ls)
-            y <- merge(y, new_data)
-          }else{
-            new_data <- do.call(cbind, new_data_ls)
-            df <- cbind(as.data.frame(df), as.data.frame(new_data))
-          }
+          new_data <- do.call(cbind, new_data_ls)
+          df <- cbind(as.data.frame(df), as.data.frame(new_data))
           return_this <- df
         }else{
           return_this <- new_data_ls
