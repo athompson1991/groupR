@@ -3,7 +3,7 @@
 groupR
 ======
 
-[![Build Status](https://travis-ci.org/athompson1991/groupR.svg?branch=master)](https://travis-ci.org/athompson1991/groupR) [![codecov.io](https://codecov.io/github/athompson1991/groupR/coverage.svg?branch=master)](https://codecov.io/github/athompson1991/groupR?branch=master) [![Dependency Status](https://dependencyci.com/github/athompson1991/groupR/badge)](https://dependencyci.com/github/athompson1991/groupR)
+[![Build Status](https://travis-ci.org/athompson1991/groupR.svg?branch=master)](https://travis-ci.org/athompson1991/groupR) [![codecov.io](https://codecov.io/github/athompson1991/groupR/coverage.svg?branch=master)](https://codecov.io/github/athompson1991/groupR?branch=master)
 
 Installation
 ------------
@@ -62,7 +62,7 @@ main_df <- data.frame(name, company, party, color, salary)
 Now that the data has been loaded, the full list of averages can be easily produced:
 
 ``` r
-my_groupr <- get_groups(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"))
+my_groupr <- groupr(main_df, groups = c("company", "party", "color"), functions = list(avg_salary = "mean(salary)"))
 print(my_groupr, include_colnames = T)
 #> n_0_group
 #> n_1_group
@@ -94,4 +94,7 @@ print(my_groupr, include_colnames = T)
 #>     |_party
 #>     |_color
 #>     |_avg_salary
+#> meta
+#>   |_groups
+#>   |_functions
 ```

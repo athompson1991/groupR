@@ -55,8 +55,7 @@ extract_df <- function(groupr, groups){
   return(out)
 }
 
-#' @describeIn extract_df Drop an observation
-#'
+#' @rdname extract_df
 drop_df <- function(groupr, groups){
   out <- extract_drop_util(groupr=groupr, groups=groups, return_type = "drop")
   return(out)
@@ -71,10 +70,10 @@ drop_grouping_level <- function(groupr, group_level){
   work_groupr <- unclass(groupr)
   work_groupr <- work_groupr[-group_level]
   work_groupr <- as.groupr(work_groupr)
-  work_groupr <- extract_drop_util(groupr=groupr, groups=groups, return_type = "drop")
   return(work_groupr)
 }
 
+#' @importFrom utils combn
 get_combinations <- function(n, char_vec){
   full_list <- list()
   for(i in 1:n){
@@ -160,5 +159,3 @@ subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- as.groupr(worked_on)
   return(worked_on)
 }
-
-

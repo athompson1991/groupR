@@ -18,9 +18,9 @@ test_that("get_combinations returns as expected", {
 })
 
 test_that("drop overall df works", {
-  expect_equal(length(drop_overall_df(test_groupr)), 3)
+  expect_equal(length(drop_overall_df(test_groupr)), 4)
   expect_true(is.list(drop_overall_df(test_groupr)))
-  expect_identical(names(drop_overall_df(test_groupr)), c("n_1_group", "n_2_group", "n_3_group"))
+  expect_identical(names(drop_overall_df(test_groupr)), c("n_1_group", "n_2_group", "n_3_group", "meta"))
 })
 
 test_that("extract dataframe returns correctly", {
@@ -36,7 +36,7 @@ test_that("drop dataframe returns correctly", {
   expect_true(is.groupr(drop_df(groupr = test_groupr, groups = "company")))
   expect_identical(test_groupr$n_1_group[-1], drop_df(groupr = test_groupr, groups = "company")$n_1_group)
   expect_identical(test_groupr$n_1_group[-2], drop_df(groupr = test_groupr, groups = "party")$n_1_group)
-  expect_identical(names(drop_df(groupr = test_groupr, groups = "company")), c("n_0_group", "n_1_group", "n_2_group", "n_3_group"))
+  expect_identical(names(drop_df(groupr = test_groupr, groups = "company")), c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta"))
   expect_equal(length(drop_df(groupr = test_groupr, groups = c("company", "party", "color"))$n_3_group), 0)
   expect_identical(test_groupr$n_2_group[-1], drop_df(groupr = test_groupr, groups = c("company", "party"))$n_2_group)
   expect_warning(warn_drop <- drop_df(groupr = test_groupr, groups = c("company", "potato")), "Not in data: potato")

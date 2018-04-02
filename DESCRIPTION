@@ -1,12 +1,12 @@
 Package: groupR
 Type: Package
 Title: Comprehensive manipulation of dataset with applications in forecasting
-Version: 0.1.0
+Version: 0.2.0
 Author: Alex Thompson
 Maintainer: Alex Thompson <alexthompson1991@hotmail.com>
 Description: In a business setting, there can be a number of demands for a particular "break-out" of data.
-    This package is designed to comprehensively work through every single combination of data breakouts based on the particular format the data comes in.
-    The groupings are defined, a function is applied, and a structured list of results is returned which aggregates the data with the given function.
+    This package is designed to comprehensively work through every single combination of data breakouts with the granular dataset.
+    The groupings are defined, functions are applied, and a structured list of results is returned which aggregates the data using the given functions.
     A number of time series functions are available as well to facilitate analysis and even forecasting.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -16,7 +16,11 @@ Imports: dplyr,
     magrittr,
     xts,
     reshape,
-    parallel
+    parallel,
+    forecast,
+    lubridate,
+    plyr,
+    methods
 Suggests: testthat,
     lazyeval,
     knitr,

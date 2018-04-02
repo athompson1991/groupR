@@ -23,10 +23,13 @@ This function takes a data frame as input and returns a grouping object as outpu
 For example, if there are two groups, A and B, four data frames are returned: data frames for A, B, both A and B, and a data frame summarizing the whole dataset.
 }
 \examples{
-default_data <- data.frame(  my_group1 = c(rep("A", 4), rep("B", 4))
-                           , my_group2 = c(rep("foo", 2), rep("bar", 2), rep("baz", 2), rep("potato", 2))
-                           , my_data = runif(n = 8)
-                          )
-groupr_object <- groupr(df = default_data, groups = "my_group1", functions = list(rando_sum = "sum(my_data)"))
+default_data <- data.frame(
+    my_group1 = rep(c("A", "B"), each = 4),
+    my_group2 = rep(c("foo", "bar", "baz", "potato"), each=2),
+    my_data = runif(n = 8)
+)
+groupr_object <- groupr(df = default_data,
+                        groups = "my_group1",
+                        functions = list(rando_sum = "sum(my_data)"))
 print(groupr_object)
 }

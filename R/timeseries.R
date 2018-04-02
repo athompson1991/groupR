@@ -1,6 +1,7 @@
 #' Extracts time series data from grouping object.
 #'
 #' @export
+#' @importFrom stats as.formula
 #' @param groupr Grouping object created with \code{groupr}
 #' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
 #' @param date_column The column with date data which will represent unique index for the returned \code{xts}
@@ -11,7 +12,9 @@
 extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
   groups <- names(groupr$n_1_group)
   groups <- groups[groups != date_column]
-  fixed_groupr <- subset(groupr, date_column, type = "intersect")
+  core_groupr <- drop_grouping_level(groupr, length(groupr))
+
+  fixed_groupr <- subset(core_groupr, date_column, type = "intersect")
   out <- lapply(fixed_groupr, function(grouping_level){
     xts_list <- lapply(grouping_level, function(df){
       column_names <- colnames(df)
@@ -41,8 +44,13 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
     return(xts_list)
   })
 
-  out <- as.xts_groupr(out)
   out <- clean_extracted_groupr(out)
+  new_meta <- groupr$meta
+  new_meta$groups <- new_meta$groups[new_meta$groups != date_column]
+  new_meta$date_column <- date_column
+  out$meta <- new_meta
+
+  out <- as.xts_groupr(out)
   return(out)
 }
 

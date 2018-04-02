@@ -21,11 +21,6 @@ or drop that single observation and return the groupr object without it.
 \description{
 Pull a leaf from the \code{groupr} tree. This will typically return a dataframe or an \code{xts} object.
 }
-\section{Functions}{
-\itemize{
-\item \code{drop_df}: Drop an observation
-}}
-
 \examples{
 groupr <- groupr(permits, groups = c("issued_month", "status", "location", "existing_use"))
 extract_df(groupr, "status")
