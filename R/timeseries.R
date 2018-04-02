@@ -3,43 +3,68 @@
 #' @export
 #' @importFrom stats as.formula
 #' @param groupr Grouping object created with \code{groupr}
-#' @param value_choice The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.
-#' @param date_column The column with date data which will represent unique index for the returned \code{xts}
-#' @return An \code{xts_groupr} object with the date column cast against the groups column, using \code{sum} to summarize the value column
+#' @param value_choice The column which will has values that will be in time
+#'   series. The function \code{cast} from the \code{reshape} package is called
+#'   to aggregate data.The function  will be \code{sum} but each value should be
+#'   unique.
+#' @param date_column The column with date data which will represent unique
+#'   index for the returned \code{xts}
+#' @return An \code{xts_groupr} object with the date column cast against the
+#'   groups column, using \code{sum} to summarize the value column
 #' @examples
-#' permits_groupr <- groupr(permits, groups = c("issued_month", "existing_const_type"))
-#' permits_xts <- extract_xts(permits_groupr, value_choice = "count", date_column = "issued_month")
-extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
+#' permits_groupr <- groupr(permits,
+#'                          groups = c("issued_month", "existing_const_type"))
+#' permits_xts <- extract_xts(permits_groupr, value_choice = "count",
+#'                             date_column = "issued_month")
+extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
   groups <- names(groupr$n_1_group)
   groups <- groups[groups != date_column]
   core_groupr <- drop_grouping_level(groupr, length(groupr))
 
-  fixed_groupr <- subset(core_groupr, date_column, type = "intersect")
-  out <- lapply(fixed_groupr, function(grouping_level){
-    xts_list <- lapply(grouping_level, function(df){
+  fixed_groupr <-
+    subset(core_groupr, date_column, type = "intersect")
+  out <- lapply(fixed_groupr, function(grouping_level) {
+    xts_list <- lapply(grouping_level, function(df) {
       column_names <- colnames(df)
       return_xts <- NULL
-      is_overall <- setequal(column_names, c(date_column, value_choice))
-      if(is_overall){
+      is_overall <-
+        setequal(column_names, c(date_column, value_choice))
+      if (is_overall) {
         date_index <- which(colnames(df) == date_column)
-        return_xts <- xts::xts(df[ ,-date_index], order.by = dplyr::pull(df, date_column))
+        return_xts <-
+          xts::xts(df[, -date_index], order.by = dplyr::pull(df, date_column))
       } else{
         groups_subset <- column_names[which(column_names %in% groups)]
-        formula_text <- paste(date_column, "~", paste(groups_subset, collapse = "+"))
-        if(length(groups_subset) > 0){
+        formula_text <-
+          paste(date_column, "~", paste(groups_subset, collapse = "+"))
+        if (length(groups_subset) > 0) {
           casting_formula <- as.formula(formula_text)
-          casted_df <- reshape::cast(df, casting_formula, fun.aggregate = sum, value = value_choice)
+          casted_df <-
+            reshape::cast(df,
+                          casting_formula,
+                          fun.aggregate = sum,
+                          value = value_choice)
           date_index <- which(colnames(casted_df) == date_column)
-          return_xts <- xts::xts(casted_df[ ,-date_index], order.by = casted_df[ ,date_index])
+          order_by <- casted_df[ ,date_index]
+          series <- casted_df[ ,-date_index]
+          return_xts <- xts::xts(x = series, order.by = order_by)
           new_colnames <- new_xts_names(df, groups_subset)
-          if(length(new_colnames) == ncol(return_xts))
+          if (length(new_colnames) == ncol(return_xts))
             colnames(return_xts) <- new_colnames
         }
       }
       return(return_xts)
     })
-    replacement_pattern <- paste0("(*\\.\\.\\.", date_column, ")|(", date_column, "\\.\\.\\.*)")
-    names(xts_list) <- gsub(names(xts_list), pattern = replacement_pattern, replacement="")
+    replacement_pattern <-
+      paste0("(*\\.\\.\\.",
+             date_column,
+             ")|(",
+             date_column,
+             "\\.\\.\\.*)")
+    names(xts_list) <-
+      gsub(names(xts_list),
+           pattern = replacement_pattern,
+           replacement = "")
     xts_list[sapply(xts_list, is.null)] <- NULL
     return(xts_list)
   })
@@ -58,18 +83,48 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt"){
 #'
 #' @export
 #' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
-#' @param ... Arguments to be passed to \code{Arima} function (from the \code{forecast} package).
-#' @param is_auto_arima A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.
-#' @param parallelize Whether or not to use the \code{parallel} package to do calculations
-#' @param interval Either "month", "week", or "day" for calculation. Alternatively, you can provide a numeric value to be passed to \code{frequency} for the \code{ts} object.
-xts_to_arima_model <- function(xts_gr_obj,  ..., is_auto_arima = TRUE, parallelize = FALSE, interval="month"){
+#' @param ... Arguments to be passed to \code{Arima} function (from the
+#'   \code{forecast} package).
+#' @param is_auto_arima A boolean value to either specify a model explicitly or
+#'   to use the \code{auto.arima} function from the \code{forecast} package.
+#' @param parallelize Whether or not to use the \code{parallel} package to do
+#'   calculations
+#' @param interval Either "month", "week", or "day" for calculation.
+#'   Alternatively, you can provide a numeric value to be passed to
+#'   \code{frequency} for the \code{ts} object.
+xts_to_arima_model <-
+  function(xts_gr_obj,
+           ...,
+           is_auto_arima = TRUE,
+           parallelize = FALSE,
+           interval = "month") {
+
   if(parallelize){
     core_count <- parallel::detectCores()-1
     cl <- parallel::makeCluster(core_count)
-    arima_mdls <- function(df) parallel::parApply(cl, df, 2, FUN = do_modeling, ...=..., is_auto_arima=is_auto_arima, interval=interval)
+    arima_mdls <-
+      function(df)
+        parallel::parApply(
+          cl,
+          df,
+          2,
+          FUN = do_modeling,
+          ... = ...,
+          is_auto_arima = is_auto_arima,
+          interval = interval
+        )
   }
   else
-    arima_mdls  <- function(df) apply(df, 2, do_modeling, ... = ..., is_auto_arima = is_auto_arima, interval=interval)
+    arima_mdls  <-
+      function(df)
+        apply(
+          df,
+          2,
+          do_modeling,
+          ... = ...,
+          is_auto_arima = is_auto_arima,
+          interval = interval
+        )
   out <- gapply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
   if(parallelize)
     parallel::stopCluster(cl)
@@ -83,7 +138,10 @@ do_modeling <- function(xts_column, is_auto_arima = F, interval, ...){
   index_day     <- lubridate::day(xts::first(index))
 
   if(interval == "month")
-    ts_data <- stats::ts(xts_column, frequency = 12, start = c(index_year, index_month))
+    ts_data <-
+    stats::ts(xts_column,
+              frequency = 12,
+              start = c(index_year, index_month))
   else if(interval == "week")
     ts_data <- stats::ts(xts_column, frequency = 52)
   else if(interval == "day")

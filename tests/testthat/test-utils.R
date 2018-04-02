@@ -24,22 +24,50 @@ test_that("drop overall df works", {
 })
 
 test_that("extract dataframe returns correctly", {
-  expect_identical(test_groupr$n_1_group$company, extract_df(groupr = test_groupr, groups = "company"))
-  expect_identical(test_groupr$n_2_group$company...party, extract_df(groupr = test_groupr, groups = c("company", "party")))
-  expect_identical(test_groupr$n_2_group$company...party, extract_df(groupr = test_groupr, groups = c("party", "company")))
-  expect_warning(warn_extract <- extract_df(groupr = test_groupr, groups = c("company", "potato")), "Not in data: potato")
+  expect_identical(
+    test_groupr$n_1_group$company,
+    extract_df(groupr = test_groupr, groups = "company")
+  )
+  expect_identical(
+    test_groupr$n_2_group$company...party,
+    extract_df(groupr = test_groupr, groups = c("company", "party"))
+  )
+  expect_identical(
+    test_groupr$n_2_group$company...party,
+    extract_df(groupr = test_groupr, groups = c("party", "company"))
+  )
+  expect_warning(warn_extract <-
+                   extract_df(groupr = test_groupr, groups = c("company", "potato")),
+                 "Not in data: potato")
   expect_identical(test_groupr$n_1_group$company, warn_extract)
-  expect_identical(test_groupr$n_3_group$company...party...color, extract_df(groupr = test_groupr, groups = c("company", "party", "color")))
+  expect_identical(
+    test_groupr$n_3_group$company...party...color,
+    extract_df(
+      groupr = test_groupr,
+      groups = c("company", "party", "color")
+    )
+  )
 })
 
 test_that("drop dataframe returns correctly", {
   expect_true(is.groupr(drop_df(groupr = test_groupr, groups = "company")))
-  expect_identical(test_groupr$n_1_group[-1], drop_df(groupr = test_groupr, groups = "company")$n_1_group)
-  expect_identical(test_groupr$n_1_group[-2], drop_df(groupr = test_groupr, groups = "party")$n_1_group)
-  expect_identical(names(drop_df(groupr = test_groupr, groups = "company")), c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta"))
-  expect_equal(length(drop_df(groupr = test_groupr, groups = c("company", "party", "color"))$n_3_group), 0)
-  expect_identical(test_groupr$n_2_group[-1], drop_df(groupr = test_groupr, groups = c("company", "party"))$n_2_group)
-  expect_warning(warn_drop <- drop_df(groupr = test_groupr, groups = c("company", "potato")), "Not in data: potato")
+  expect_identical(
+    test_groupr$n_1_group[-1],
+    drop_df(groupr = test_groupr, groups = "company")$n_1_group
+  )
+  expect_identical(test_groupr$n_1_group[-2],
+                   drop_df(groupr = test_groupr, groups = "party")$n_1_group)
+  expect_identical(names(drop_df(groupr = test_groupr, groups = "company")),
+                   c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta"))
+  expect_equal(length(drop_df(
+    groupr = test_groupr,
+    groups = c("company", "party", "color")
+  )$n_3_group), 0)
+  expect_identical(test_groupr$n_2_group[-1],
+                   drop_df(groupr = test_groupr, groups = c("company", "party"))$n_2_group)
+  expect_warning(warn_drop <-
+                   drop_df(groupr = test_groupr, groups = c("company", "potato")),
+                 "Not in data: potato")
   expect_identical(test_groupr$n_1_group[-1], warn_drop$n_1_group)
 })
 
@@ -74,9 +102,32 @@ test_that("subset works", {
 
 })
 
-test_that("auto_other_label works", {
+test_that("othr_label works", {
   renamed_df <- other_label(permits, "existing_use", percentile = 0.9)
-  expect_equal(sort(unique(renamed_df$existing_use)), c("1 family dwelling", "2 family dwelling", "apartments", "office", "other", "retail sales"))
-  renamed_df <- other_label(permits, "status", custom=c("approved", "expired", "incomplete", "expired", "reinstated", "revoked", "suspend", "withdrawn"))
+  expect_equal(
+    sort(unique(renamed_df$existing_use)),
+    c(
+      "1 family dwelling",
+      "2 family dwelling",
+      "apartments",
+      "office",
+      "other",
+      "retail sales"
+    )
+  )
+  renamed_df <- other_label(
+    permits,
+    "status",
+    custom = c(
+      "approved",
+      "expired",
+      "incomplete",
+      "expired",
+      "reinstated",
+      "revoked",
+      "suspend",
+      "withdrawn"
+    )
+  )
   expect_equal(sort(unique(renamed_df$status)), c("cancelled", "complete", "issued", "other"))
 })

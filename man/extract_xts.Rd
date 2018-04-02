@@ -9,12 +9,17 @@ extract_xts(groupr, value_choice, date_column = "dd_dt")
 \arguments{
 \item{groupr}{Grouping object created with \code{groupr}}
 
-\item{value_choice}{The column which will has values that will be in time series. The function \code{cast} from the \code{reshape} package is called to aggregate data.The function  will be \code{sum} but each value should be unique.}
+\item{value_choice}{The column which will has values that will be in time
+series. The function \code{cast} from the \code{reshape} package is called
+to aggregate data.The function  will be \code{sum} but each value should be
+unique.}
 
-\item{date_column}{The column with date data which will represent unique index for the returned \code{xts}}
+\item{date_column}{The column with date data which will represent unique
+index for the returned \code{xts}}
 }
 \value{
-An \code{xts_groupr} object with the date column cast against the groups column, using \code{sum} to summarize the value column
+An \code{xts_groupr} object with the date column cast against the
+  groups column, using \code{sum} to summarize the value column
 }
 \description{
 Extracts time series data from grouping object.

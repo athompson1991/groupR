@@ -9,18 +9,23 @@ groupr(df, groups, functions = list(count = "n()"), depth = length(groups))
 \arguments{
 \item{df}{A data frame of raw data.}
 
-\item{groups}{A character vector of column names in df that will be basis for aggregation.}
+\item{groups}{A character vector of column names in df that will be basis for
+aggregation.}
 
 \item{functions}{A named list of functions for aggregation.}
 
 \item{depth}{How far down the tree the combinations should work out.}
 }
 \value{
-A grouping object (list that aggregates functions by every potential combination)
+A grouping object (list that aggregates functions by every potential
+  combination)
 }
 \description{
-This function takes a data frame as input and returns a grouping object as output. The grouping object is a list of lists of data frames, one data frame for every possible combination of groups.
-For example, if there are two groups, A and B, four data frames are returned: data frames for A, B, both A and B, and a data frame summarizing the whole dataset.
+This function takes a data frame as input and returns a grouping object as
+output. The grouping object is a list of lists of data frames, one data frame
+for every possible combination of groups. For example, if there are two
+groups, A and B, four data frames are returned: data frames for A, B, both A
+and B, and a data frame summarizing the whole dataset.
 }
 \examples{
 default_data <- data.frame(
