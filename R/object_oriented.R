@@ -1,11 +1,16 @@
-is.groupr <- function(x) inherits(x, "groupr")
-as.groupr <- function(in_list) structure(in_list, class="groupr")
-as.xts_groupr <- function(in_list) structure(in_list, class=c("xts_groupr", "groupr"))
+is.groupr <- function(x)
+  inherits(x, "groupr")
+as.groupr <- function(in_list)
+  structure(in_list, class = "groupr")
+as.xts_groupr <-
+  function(in_list)
+    structure(in_list, class = c("xts_groupr", "groupr"))
 
 #' Apply across a groupr object
 #'
-#' An S3 method for applying a function to a groupr object. This is typically a way to simply loop through
-#' the object which simplifies complicated \code{lapply} functions.
+#' An S3 method for applying a function to a groupr object. This is typically a
+#' way to simply loop through the object which simplifies complicated
+#' \code{lapply} functions.
 #'
 #' @export
 #' @param groupr The \code{groupr} object to loop through
@@ -22,24 +27,27 @@ gapply <- function(groupr, new_functions, is_cbind = F) UseMethod("gapply")
 #' @param include_colnames Boolean for whether or not to print colnames in tree
 #' @param ... Additional arguments
 #' @examples
-#' groupr <- groupr(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+#' groupr <- groupr(
+#'   permits,
+#'   groups = c('type_desc', 'issued_month', 'existing_use')
+#' )
 #' print(groupr)
-print.groupr <- function(x, include_colnames = F, ...){
+print.groupr <- function(x, include_colnames = F, ...) {
   groups <- names(x$n_1_group)
 
   indent <- "  "
   tree_stem <- "|_"
   newline <- "\n"
-  for(grouping_level in names(x)){
+  for (grouping_level in names(x)) {
     cat(grouping_level)
     cat(newline)
-    if(grouping_level != "n_0_group"){
-      for(df_name in names(x[[grouping_level]])){
+    if (grouping_level != "n_0_group") {
+      for (df_name in names(x[[grouping_level]])) {
         cat(indent)
         cat(tree_stem)
         cat(df_name)
-        if(include_colnames) {
-          for(col in colnames(x[[grouping_level]][[df_name]])){
+        if (include_colnames) {
+          for (col in colnames(x[[grouping_level]][[df_name]])) {
             cat(newline)
             cat(indent)
             cat(indent)
@@ -47,7 +55,7 @@ print.groupr <- function(x, include_colnames = F, ...){
             cat(col)
           }
         }
-      cat(newline)
+        cat(newline)
       }
     }
   }

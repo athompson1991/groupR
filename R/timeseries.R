@@ -17,7 +17,7 @@
 #' permits_xts <- extract_xts(permits_groupr, value_choice = "count",
 #'                             date_column = "issued_month")
 extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
-  groups <- names(groupr$n_1_group)
+  groups <- get_groups(groupr)
   groups <- groups[groups != date_column]
   core_groupr <- drop_grouping_level(groupr, length(groupr))
 
@@ -31,8 +31,9 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
         setequal(column_names, c(date_column, value_choice))
       if (is_overall) {
         date_index <- which(colnames(df) == date_column)
-        return_xts <-
-          xts::xts(df[, -date_index], order.by = dplyr::pull(df, date_column))
+        series <- df[, -date_index]
+        order_by <- dplyr::pull(df, date_column)
+        return_xts <- xts::xts(series, order.by = order_by)
       } else{
         groups_subset <- column_names[which(column_names %in% groups)]
         formula_text <-
@@ -55,15 +56,12 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
       }
       return(return_xts)
     })
-    replacement_pattern <-
-      paste0("(*\\.\\.\\.",
-             date_column,
-             ")|(",
-             date_column,
-             "\\.\\.\\.*)")
+    d1 <- "\\.\\.\\.*"
+    d2 <- "*\\.\\.\\."
+    replace <- paste0("(", d1, date_column, ")|(", date_column, d2, ")")
     names(xts_list) <-
       gsub(names(xts_list),
-           pattern = replacement_pattern,
+           pattern = replace,
            replacement = "")
     xts_list[sapply(xts_list, is.null)] <- NULL
     return(xts_list)
@@ -98,78 +96,79 @@ xts_to_arima_model <-
            is_auto_arima = TRUE,
            parallelize = FALSE,
            interval = "month") {
-
-  if(parallelize){
-    core_count <- parallel::detectCores()-1
-    cl <- parallel::makeCluster(core_count)
-    arima_mdls <-
-      function(df)
-        parallel::parApply(
-          cl,
-          df,
-          2,
-          FUN = do_modeling,
-          ... = ...,
-          is_auto_arima = is_auto_arima,
-          interval = interval
-        )
+    if (parallelize) {
+      core_count <- parallel::detectCores() - 1
+      cl <- parallel::makeCluster(core_count)
+      arima_mdls <-
+        function(df)
+          parallel::parApply(
+            cl,
+            df,
+            2,
+            FUN = do_modeling,
+            ... = ...,
+            is_auto_arima = is_auto_arima,
+            interval = interval
+          )
+    }
+    else
+      arima_mdls  <-
+        function(df)
+          apply(
+            df,
+            2,
+            do_modeling,
+            ... = ...,
+            is_auto_arima = is_auto_arima,
+            interval = interval
+          )
+    out <- gapply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+    if (parallelize)
+      parallel::stopCluster(cl)
+    return(out)
   }
-  else
-    arima_mdls  <-
-      function(df)
-        apply(
-          df,
-          2,
-          do_modeling,
-          ... = ...,
-          is_auto_arima = is_auto_arima,
-          interval = interval
-        )
-  out <- gapply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
-  if(parallelize)
-    parallel::stopCluster(cl)
-  return(out)
-}
 
-do_modeling <- function(xts_column, is_auto_arima = F, interval, ...){
-  index   <- as.Date(names(xts_column))
-  index_year    <- lubridate::year(xts::first(index))
-  index_month   <- lubridate::month(xts::first(index))
-  index_day     <- lubridate::day(xts::first(index))
+do_modeling <-
+  function(xts_column, is_auto_arima = F, interval, ...) {
+    index   <- as.Date(names(xts_column))
+    index_year    <- lubridate::year(xts::first(index))
+    index_month   <- lubridate::month(xts::first(index))
+    index_day     <- lubridate::day(xts::first(index))
 
-  if(interval == "month")
-    ts_data <-
-    stats::ts(xts_column,
-              frequency = 12,
-              start = c(index_year, index_month))
-  else if(interval == "week")
-    ts_data <- stats::ts(xts_column, frequency = 52)
-  else if(interval == "day")
-    ts_data <- stats::ts(xts_column, frequency = 7)
-  else if(is.numeric(interval))
-    ts_data <- stats::ts(xts_column, frequency = interval)
-  else
-    stop("Bad interval choice")
+    if (interval == "month")
+      ts_data <-
+      stats::ts(xts_column,
+                frequency = 12,
+                start = c(index_year, index_month))
+    else if (interval == "week")
+      ts_data <- stats::ts(xts_column, frequency = 52)
+    else if (interval == "day")
+      ts_data <- stats::ts(xts_column, frequency = 7)
+    else if (is.numeric(interval))
+      ts_data <- stats::ts(xts_column, frequency = interval)
+    else
+      stop("Bad interval choice")
 
-  if(is_auto_arima)
-    model <- forecast::auto.arima(ts_data)
-  else
-    model <- forecast::Arima(y = ts_data, ...)
+    if (is_auto_arima)
+      model <- forecast::auto.arima(ts_data)
+    else
+      model <- forecast::Arima(y = ts_data, ...)
 
-  model
-}
+    model
+  }
 
-clean_extracted_groupr <- function(groupr){
+clean_extracted_groupr <- function(groupr) {
   groupr$n_0_group <- NULL
-  names(groupr) <- paste("n", 0:(length(groupr) - 1), "group", sep= "_")
+  vals <- 0:(length(groupr) - 1)
+  names(groupr) <- paste("n", vals, "group", sep = "_")
   groupr$n_0_group <- groupr$n_0_group[[1]]
   names(groupr$n_0_group) <- "overall"
   return(groupr)
 }
 
-new_xts_names <- function(df, groups){
-  data_combinations <- as.data.frame(dplyr::distinct(df[ ,groups]))
-  new_col_names <- apply(data_combinations, 1, paste0, collapse="/")
+new_xts_names <- function(df, groups) {
+  data_combn <- as.data.frame(dplyr::distinct(df[, groups]))
+  new_col_names <- apply(data_combn, 1, paste0, collapse = "/")
   new_col_names <- gsub(pattern = " ", "_", new_col_names)
   new_col_names <- tolower(new_col_names)
   new_col_names[new_col_names == ""] <- "blank_string"

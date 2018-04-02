@@ -20,7 +20,8 @@ test_that("get_combinations returns as expected", {
 test_that("drop overall df works", {
   expect_equal(length(drop_overall_df(test_groupr)), 4)
   expect_true(is.list(drop_overall_df(test_groupr)))
-  expect_identical(names(drop_overall_df(test_groupr)), c("n_1_group", "n_2_group", "n_3_group", "meta"))
+  expect_identical(names(drop_overall_df(test_groupr)),
+                   c("n_1_group", "n_2_group", "n_3_group", "meta"))
 })
 
 test_that("extract dataframe returns correctly", {

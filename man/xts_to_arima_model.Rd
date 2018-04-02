@@ -10,13 +10,18 @@ xts_to_arima_model(xts_gr_obj, ..., is_auto_arima = TRUE,
 \arguments{
 \item{xts_gr_obj}{A list of \code{xts} data produced with \code{extract_xts}.}
 
-\item{...}{Arguments to be passed to \code{Arima} function (from the \code{forecast} package).}
+\item{...}{Arguments to be passed to \code{Arima} function (from the
+\code{forecast} package).}
 
-\item{is_auto_arima}{A boolean value to either specify a model explicitly or to use the \code{auto.arima} function from the \code{forecast} package.}
+\item{is_auto_arima}{A boolean value to either specify a model explicitly or
+to use the \code{auto.arima} function from the \code{forecast} package.}
 
-\item{parallelize}{Whether or not to use the \code{parallel} package to do calculations}
+\item{parallelize}{Whether or not to use the \code{parallel} package to do
+calculations}
 
-\item{interval}{Either "month", "week", or "day" for calculation. Alternatively, you can provide a numeric value to be passed to \code{frequency} for the \code{ts} object.}
+\item{interval}{Either "month", "week", or "day" for calculation.
+Alternatively, you can provide a numeric value to be passed to
+\code{frequency} for the \code{ts} object.}
 }
 \description{
 Models time series list with an ARIMA model.

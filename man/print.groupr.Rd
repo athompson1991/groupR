@@ -17,6 +17,9 @@
 Print a groupr object as tree.
 }
 \examples{
-groupr <- groupr(permits, groups = c('type_desc', 'issued_month', 'existing_use'))
+groupr <- groupr(
+  permits,
+  groups = c('type_desc', 'issued_month', 'existing_use')
+)
 print(groupr)
 }

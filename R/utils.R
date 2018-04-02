@@ -20,37 +20,47 @@
 #' summary(as.factor(permits$type_desc))
 #' permits_cleaned <- other_label(permits, "type_desc")
 #' summary(as.factor(permits_cleaned$type_desc))
-other_label <- function(df, column, percentile=0.9, custom=NULL){
-  work_vector <- df[ ,column]
-  if(is.character(work_vector))
+other_label <- function(df,
+                        column,
+                        percentile = 0.9,
+                        custom = NULL) {
+  work_vector <- df[, column]
+  if (is.character(work_vector))
     work_vector <- as.factor(work_vector)
 
-  if(is.null(custom)){
+  if (is.null(custom)) {
     counts <- summary(work_vector)
-    ordered_counts <- counts[order(counts, decreasing=T)]
-    pct_contrib <- ordered_counts/sum(ordered_counts)
+    ordered_counts <- counts[order(counts, decreasing = T)]
+    pct_contrib <- ordered_counts / sum(ordered_counts)
     pct_cumsum <- cumsum(pct_contrib)
-    rename_these <- names(which(pct_cumsum > percentile))
+    rename <- names(which(pct_cumsum > percentile))
   } else {
-    rename_these = custom
+    rename = custom
   }
-  relabelled_vector <- plyr::mapvalues(df[ ,column], from=rename_these, to=rep("other", length(rename_these)))
-  df[ ,column] <- relabelled_vector
+
+  fix_this <- df[, column]
+  others <- rep("other", length(rename))
+  relabelled_vector <- plyr::mapvalues(fix_this, rename, others)
+  df[, column] <- relabelled_vector
   return(df)
 }
 
-
 #' Extract or drop an observation
 #'
-#' Pull a leaf from the \code{groupr} tree. This will typically return a dataframe or an \code{xts} object.
+#' Pull a leaf from the \code{groupr} tree. This will typically return a
+#' dataframe or an \code{xts} object.
 #'
 #' @export
 #' @param groupr The groupr object to pull from
 #' @param groups The desired groups
-#' @return Will extract he desired observation, a single dataframe or \code{xts} object and return it,
-#' or drop that single observation and return the groupr object without it.
+#' @return Will extract he desired observation, a single dataframe or \code{xts}
+#'   object and return it, or drop that single observation and return the groupr
+#'   object without it.
 #' @examples
-#' groupr <- groupr(permits, groups = c("issued_month", "status", "location", "existing_use"))
+#' groupr <- groupr(
+#'   permits,
+#'   groups = c("issued_month", "status", "location", "existing_use")
+#' )
 #' extract_df(groupr, "status")
 #' extract_df(groupr, c("existing_use", "status"))
 extract_df <- function(groupr, groups){
@@ -86,10 +96,12 @@ get_combinations <- function(n, char_vec){
   return(full_list)
 }
 
-calculate_df_index <- function(main_list, group_level, groups){
+calculate_df_index <- function(main_list, group_level, groups) {
   group_level_list <- main_list[[group_level]]
-  if(length(group_level_list) > 1){
-    logic_matrix <- sapply(groups, function(s) grepl(s, names(group_level_list)))
+  if (length(group_level_list) > 1) {
+    logic_matrix <-
+      sapply(groups, function(s)
+        grepl(s, names(group_level_list)))
     df_index <- which(apply(logic_matrix, 1, all))
   } else {
     df_index <- 1
@@ -123,18 +135,22 @@ reassign_overall_df <- function(original, worked_on){
   }
 }
 
-extract_drop_util <- function(groupr, groups, return_type){
+
+extract_drop_util <- function(groupr, groups, return_type) {
   return_this <- NULL
   work_groupr <- drop_overall_df(groupr)
   valid_groups <- clean_raw_groups(work_groupr, groups)
   group_level <- length(valid_groups)
   group_level_list <- work_groupr[[group_level]]
-  df_index <- calculate_df_index(main_list = work_groupr, group_level = group_level, groups = valid_groups)
-  if(return_type == "extract"){
+  df_index <-
+    calculate_df_index(main_list = work_groupr,
+                       group_level = group_level,
+                       groups = valid_groups)
+  if (return_type == "extract") {
     return_this <- group_level_list[df_index]
     return_this <- return_this[[1]]
   }
-  if(return_type == "drop"){
+  if (return_type == "drop") {
     work_groupr[[group_level]] <- work_groupr[[group_level]][-df_index]
     work_groupr <- reassign_overall_df(groupr, work_groupr)
     work_groupr <- as.groupr(work_groupr)

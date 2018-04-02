@@ -15,14 +15,19 @@ drop_df(groupr, groups)
 \item{groups}{The desired groups}
 }
 \value{
-Will extract he desired observation, a single dataframe or \code{xts} object and return it,
-or drop that single observation and return the groupr object without it.
+Will extract he desired observation, a single dataframe or \code{xts}
+  object and return it, or drop that single observation and return the groupr
+  object without it.
 }
 \description{
-Pull a leaf from the \code{groupr} tree. This will typically return a dataframe or an \code{xts} object.
+Pull a leaf from the \code{groupr} tree. This will typically return a
+dataframe or an \code{xts} object.
 }
 \examples{
-groupr <- groupr(permits, groups = c("issued_month", "status", "location", "existing_use"))
+groupr <- groupr(
+  permits,
+  groups = c("issued_month", "status", "location", "existing_use")
+)
 extract_df(groupr, "status")
 extract_df(groupr, c("existing_use", "status"))
 }

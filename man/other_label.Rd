@@ -19,15 +19,15 @@ other_label(df, column, percentile = 0.9, custom = NULL)
 The dataframe with reassigned column
 }
 \description{
-Often times, a dataset will have groups which are distributed somewhat
-exponentially - almost all rows fall into a few group values, but there are
-many smaller group values for the remaining observations. For example, you
-may have a dataset with employee level observations and want to use "US
-State" as a group, but 90\% of the observations fall into New York,
-California, Texas, and perhaps 6 other states. All remaining observations are
-distributed amongst the remaining 41 states, but you might prefer to lump all
-of those observations into a single bucket. This functions provides a way to
-reassign all those observations to "other".
+Often times, a dataset will have groups which will see almost all rows fall
+into a few group values, but there are many smaller group values for the
+remaining observations. For example, you may have a dataset with employee
+level observations and want to use "US State" as a group, but 90\% of the
+observations fall into New York, California, Texas, and perhaps 6 other
+states. All remaining observations are distributed amongst the remaining 41
+states, but you might prefer to lump all of those observations into a single
+bucket. This functions provides a way to reassign all those observations to
+"other".
 }
 \examples{
 summary(as.factor(permits$type_desc))

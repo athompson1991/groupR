@@ -14,6 +14,7 @@ gapply(groupr, new_functions, is_cbind = F)
 \item{is_cbind}{Whether or not to cbind to the original dataframes}
 }
 \description{
-An S3 method for applying a function to a groupr object. This is typically a way to simply loop through
-the object which simplifies complicated \code{lapply} functions.
+An S3 method for applying a function to a groupr object. This is typically a
+way to simply loop through the object which simplifies complicated
+\code{lapply} functions.
 }
