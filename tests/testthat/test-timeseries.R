@@ -14,7 +14,6 @@ extracted_groupr <- extract_xts(
   date_col = "dates"
 )
 
-
 test_that("get_groups returns correct names", {
   expect_identical(get_groups(extracted_groupr),
                    c("companies", "states", "department"))
@@ -49,24 +48,46 @@ test_that("extract_xts gives right classes", {
   expect_identical(class(extracted_groupr$n_1_group$department), c("xts", "zoo"))
 })
 
-test_that("extract_xts gives right xts names", {
-  expect_identical(colnames(extracted_groupr$n_0_group), "overall")
-  expect_identical(colnames(extracted_groupr$n_1_group$companies), c("company_a", "company_b", "company_c"))
-  expect_identical(colnames(extracted_groupr$n_1_group$states), c("wa", "ca"))
-  expect_identical(colnames(extracted_groupr$n_1_group$department), c("sales", "marketing"))
-  expect_identical(
-    colnames(extracted_groupr$n_2_group$companies...states),
-    c(
-      "company_a/wa",
-      "company_a/ca",
-      "company_b/wa",
-      "company_b/ca",
-      "company_c/wa",
-      "company_c/ca"
-    )
-  )
-})
 
-test_that("values are correct", {
-  expect_equal(as.numeric(extract_df(extracted_groupr, "companies")[1,1]), 0.647116, tolerance = 0.0001)
+test_that("extract_xts gives right xts names", {
+    expect_identical(colnames(extracted_groupr$n_0_group), "overall")
+    expect_identical(
+      colnames(extracted_groupr$n_1_group$companies),
+      c("company_a", "company_b", "company_c")
+    )
+    expect_identical(colnames(extracted_groupr$n_1_group$states), c("wa", "ca"))
+    expect_identical(colnames(extracted_groupr$n_1_group$department),
+                     c("sales", "marketing"))
+    expect_identical(
+      colnames(extracted_groupr$n_2_group$companies...states),
+      c(
+        "company_a/wa",
+        "company_a/ca",
+        "company_b/wa",
+        "company_b/ca",
+        "company_c/wa",
+        "company_c/ca"
+      )
+    )
+  })
+
+test_that("fill_xts works for day, week, month", {
+  # Set up
+  set.seed(1000)
+  end_dates <- as.Date(c("2017-01-06", "2017-02-05", "2017-06-01"))
+  intervals <- c("day", "week", "month")
+  start <- as.Date("2017-01-01")
+
+  for(i in 1:3){
+    end <- end_dates[i]
+    dates <- seq.Date(from = start, to = end, by = intervals[i])
+    messy <- xts::xts(rnorm(5), order.by = dates[-3])
+
+    # Test
+    expect_equal(
+      zoo::index(fill_xts(messy, intervals[i])),
+      dates,
+      check.attributes = F
+    )
+  }
 })
