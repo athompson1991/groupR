@@ -20,7 +20,8 @@ Imports: dplyr,
     forecast,
     lubridate,
     plyr,
-    methods
+    methods,
+    zoo
 Suggests: testthat,
     lazyeval,
     knitr,
