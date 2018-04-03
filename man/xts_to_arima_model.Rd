@@ -2,7 +2,7 @@
 % Please edit documentation in R/timeseries.R
 \name{xts_to_arima_model}
 \alias{xts_to_arima_model}
-\title{Models time series list with an ARIMA model.}
+\title{Model time series list with ARIMA}
 \usage{
 xts_to_arima_model(xts_gr_obj, ..., is_auto_arima = TRUE,
   parallelize = FALSE, interval = "month")
@@ -24,5 +24,5 @@ Alternatively, you can provide a numeric value to be passed to
 \code{frequency} for the \code{ts} object.}
 }
 \description{
-Models time series list with an ARIMA model.
+Model time series list with ARIMA
 }

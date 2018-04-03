@@ -29,12 +29,13 @@ can be passed.
 }
 \examples{
 permits_groupr <- groupr(
-         permits,
-         groups = c("type_desc", "issued_date", "existing_const_type")
-         )
+  permits,
+  groups = c("type_desc", "issued_date", "existing_const_type")
+)
 extract_df(permits_groupr, "existing_const_type")
 applied_groupr <- gapply(permits_groupr,
-                         list(rounded = function(df) round(df$count, -2)),
-                         is_cbind = TRUE)
+  list(rounded = function(df) round(df$count, -2)),
+  is_cbind = TRUE
+)
 extract_df(applied_groupr, "existing_const_type")
 }

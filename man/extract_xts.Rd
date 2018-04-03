@@ -11,8 +11,8 @@ extract_xts(groupr, value_choice, date_column = "dd_dt")
 
 \item{value_choice}{The column which will has values that will be in time
 series. The function \code{cast} from the \code{reshape} package is called
-to aggregate data.The function  will be \code{sum} but each value should be
-unique.}
+to aggregate data. The function  will be \code{sum} but each value should
+be unique when cast against the remaining groups.}
 
 \item{date_column}{The column with date data which will represent unique
 index for the returned \code{xts}}
@@ -22,11 +22,23 @@ An \code{xts_groupr} object with the date column cast against the
   groups column, using \code{sum} to summarize the value column
 }
 \description{
-Extracts time series data from grouping object.
+If one of the groups in a \code{groupr} object is a date, then the object can
+be manipulated into an \code{xts} based \code{groupr} object. This is done by
+casting the date column against the unique values in the other grouping
+columns. A value column must be chosen in order to "fill in" the returned
+dataframe. The combination between the unique group values for the groups
+which aren't dates can result in many columns per resultant dataframe, so
+caution should be exercised when producing \code{xts} based \code{groupr}
+objects.
 }
 \examples{
-permits_groupr <- groupr(permits,
-                         groups = c("issued_month", "existing_const_type"))
-permits_xts <- extract_xts(permits_groupr, value_choice = "count",
-                            date_column = "issued_month")
+permits_groupr <- groupr(
+  permits,
+  groups = c("issued_month", "existing_const_type")
+)
+permits_xts <- extract_xts(
+  permits_groupr,
+  value_choice = "count",
+  date_column = "issued_month"
+)
 }

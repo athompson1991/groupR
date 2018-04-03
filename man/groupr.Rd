@@ -29,12 +29,14 @@ and B, and a data frame summarizing the whole dataset.
 }
 \examples{
 default_data <- data.frame(
-    my_group1 = rep(c("A", "B"), each = 4),
-    my_group2 = rep(c("foo", "bar", "baz", "potato"), each=2),
-    my_data = runif(n = 8)
+  my_group1 = rep(c("A", "B"), each = 4),
+  my_group2 = rep(c("foo", "bar", "baz", "potato"), each=2),
+  my_data = runif(n = 8)
 )
-groupr_object <- groupr(df = default_data,
-                        groups = "my_group1",
-                        functions = list(rando_sum = "sum(my_data)"))
+groupr_object <- groupr(
+  df = default_data,
+  groups = "my_group1",
+  functions = list(rando_sum = "sum(my_data)")
+)
 print(groupr_object)
 }

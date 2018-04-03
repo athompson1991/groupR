@@ -17,70 +17,49 @@
 #'   combination)
 #' @examples
 #' default_data <- data.frame(
-#'     my_group1 = rep(c("A", "B"), each = 4),
-#'     my_group2 = rep(c("foo", "bar", "baz", "potato"), each=2),
-#'     my_data = runif(n = 8)
+#'   my_group1 = rep(c("A", "B"), each = 4),
+#'   my_group2 = rep(c("foo", "bar", "baz", "potato"), each=2),
+#'   my_data = runif(n = 8)
 #' )
-#' groupr_object <- groupr(df = default_data,
-#'                         groups = "my_group1",
-#'                         functions = list(rando_sum = "sum(my_data)"))
+#' groupr_object <- groupr(
+#'   df = default_data,
+#'   groups = "my_group1",
+#'   functions = list(rando_sum = "sum(my_data)")
+#' )
 #' print(groupr_object)
-groupr <-
-  function(df,
-           groups,
-           functions = list("count" = "n()"),
-           depth = length(groups)) {
-    group_combinations <- get_combinations(depth, groups)
-    function_count <- length(functions)
-    column_names <- names(functions)
-    functions_raw <- functions
-    df_raw <- df
-    functions <-
-      as.vector(sapply(column_names, function(f)
-        functions[[f]]))
+groupr <- function(df, groups,
+                   functions = list("count" = "n()"),
+                   depth = length(groups)) {
 
-    group_level_list <- lapply(group_combinations, function(mtx) {
-      df <- apply(mtx, 2, function(column) {
-        group_selection <- as.vector(column)
-        dplyr_list <-
-          dplyr_loop(in_df = df,
-                     functions = functions,
-                     selection = group_selection)
-        groups_columns <-
-          as.data.frame(dplyr_list[[1]][, 1:length(group_selection)])
-        dplyr_list <-
-          lapply(dplyr_list, function(df)
-            df[, -c(1:length(group_selection))])
-        worked_on_df <- do.call(cbind, dplyr_list)
-        worked_on_df <- cbind(groups_columns, worked_on_df)
-        worked_on_df <-
-          dplyr::grouped_df(worked_on_df, group_selection)
-        colnames(worked_on_df)[tail(1:ncol(worked_on_df), function_count)] <-
-          column_names
-        return(worked_on_df)
-      })
-      names(df) <-
-        apply(mtx, 2, function(column)
-          paste(column, collapse = "..."))
-      df
+  meta <- list(groups = groups, functions = functions)
+  group_combinations <- get_combinations(depth, groups)
+  function_count <- length(functions)
+  column_names <- names(functions)
+  get_str_fn <- function(f) functions[[f]]
+  string_functions <- as.vector(sapply(column_names, get_str_fn))
+
+  group_level_list <- lapply(group_combinations, function(mtx) {
+    df_list <- apply(mtx, 2, function(column) {
+      group_selection <- as.vector(column)
+      loop_ls <- dplyr_loop(df, string_functions, group_selection)
+      df <- df_work(loop_ls, group_selection)
+      logic <- tail(1:ncol(df), function_count)
+      colnames(df)[logic] <- column_names
+      return(df)
     })
+    name_fn <- function(column) paste(column, collapse = "...")
+    names(df_list) <- apply(mtx, 2, name_fn)
+    return(df_list)
+  })
 
-    overall <-
-      as.data.frame(sapply(functions, function(s)
-        dplyr::summarise_(df, lazyeval::interp(s))))
-    colnames(overall) <- column_names
-    overall <- dplyr::as.tbl(overall)
-    overall_list <- list(overall = overall)
-
-    group_level_list <- c(overall_list, group_level_list)
-    names(group_level_list) <-
-      paste("n_", 0:depth, "_group", sep = "")
-
-    group_level_list$meta <-
-      list(groups = groups, functions = functions_raw)
-    out <- structure(group_level_list, class = "groupr")
-    return(out)
-  }
+  overall_list <- overall_calc(functions, df)
+  group_level_list <- c(overall_list, group_level_list)
+  names(group_level_list) <-
+    paste("n_", 0:depth, "_group", sep = "")
+  group_level_list$meta <- meta
+  out <- structure(group_level_list, class = "groupr")
+  return(out)
+}
 
 dplyr_loop <- function(in_df, functions, selection){
   lapply(functions, function(f){
@@ -91,6 +70,25 @@ dplyr_loop <- function(in_df, functions, selection){
   })
 }
 
+df_work <- function(loop_ls, group_selection){
+  index <- 1:length(group_selection)
+  groups_columns <- as.data.frame(loop_ls[[1]][, index])
+  fn <- function(df) df[,-index]
+  loop_ls <- lapply(loop_ls, fn)
+  worked_on_df <- do.call(cbind, loop_ls)
+  worked_on_df <- cbind(groups_columns, worked_on_df)
+  worked_on_df <-
+    dplyr::grouped_df(worked_on_df, group_selection)
+}
+
+overall_calc <- function(functions, df){
+  fn <- function(s) dplyr::summarise_(df, lazyeval::interp(s))
+  overall <- as.data.frame(sapply(functions, fn))
+  colnames(overall) <- names(functions)
+  overall <- dplyr::as.tbl(overall)
+  overall_list <- list(overall = overall)
+  return(overall_list)
+}
 
 #' Get the groups or functions from a \code{groupr} object
 #'
@@ -130,13 +128,14 @@ get_functions <- function(groupr){
 #'   (with similar dimensions as the \code{groupr})
 #' @examples
 #' permits_groupr <- groupr(
-#'          permits,
-#'          groups = c("type_desc", "issued_date", "existing_const_type")
-#'          )
+#'   permits,
+#'   groups = c("type_desc", "issued_date", "existing_const_type")
+#' )
 #' extract_df(permits_groupr, "existing_const_type")
 #' applied_groupr <- gapply(permits_groupr,
-#'                          list(rounded = function(df) round(df$count, -2)),
-#'                          is_cbind = TRUE)
+#'   list(rounded = function(df) round(df$count, -2)),
+#'   is_cbind = TRUE
+#' )
 #' extract_df(applied_groupr, "existing_const_type")
 gapply.groupr <- function(groupr, new_functions, is_cbind = F) {
   raw_names <- names(new_functions)
