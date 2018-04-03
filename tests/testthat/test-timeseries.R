@@ -14,16 +14,31 @@ extracted_groupr <- extract_xts(
   date_col = "dates"
 )
 
+
 test_that("get_groups returns correct names", {
-  expect_identical(get_groups(extracted_groupr), c("companies", "states", "department"))
+  expect_identical(get_groups(extracted_groupr),
+                   c("companies", "states", "department"))
 })
 
+
 test_that("extract_xts gives right group level names", {
-  expect_identical(names(extracted_groupr), c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta"))
+  expect_identical(
+    names(extracted_groupr),
+    c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta")
+  )
   expect_identical(names(extracted_groupr$n_0_group), "overall")
-  expect_identical(names(extracted_groupr$n_1_group), c("companies", "states", "department"))
-  expect_identical(names(extracted_groupr$n_2_group), c("companies...states", "companies...department", "states...department"))
-  expect_identical(names(extracted_groupr$n_3_group), c("companies...states...department"))
+  expect_identical(names(extracted_groupr$n_1_group),
+                   c("companies", "states", "department"))
+  expect_identical(
+    names(extracted_groupr$n_2_group),
+    c(
+      "companies...states",
+      "companies...department",
+      "states...department"
+    )
+  )
+  expect_identical(names(extracted_groupr$n_3_group),
+                   c("companies...states...department"))
 })
 
 test_that("extract_xts gives right classes", {

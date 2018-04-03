@@ -139,18 +139,10 @@ get_functions <- function(groupr){
 #' extract_df(applied_groupr, "existing_const_type")
 gapply.groupr <- function(groupr, new_functions, is_cbind = F) {
   raw_names <- names(new_functions)
+  check_functions(new_functions)
+  core <- drop_grouping_level(groupr, length(groupr))
 
-  if (is.null(names(new_functions)))
-    stop("Functions must be named")
-
-  for (i in new_functions)
-    if (!identical(formalArgs(i), "df"))
-      stop("Functions must take only one argument, named df")
-
-  core_groupr <-
-    drop_grouping_level(groupr = groupr, group_level = length(groupr))
-
-  top_applied <- lapply(core_groupr, function(df_list) {
+  top_applied <- lapply(core, function(df_list) {
     group_level_applied <- lapply(df_list, function(df) {
       has_no_columns <- is.null(ncol(df))
       if (!has_no_columns) {
@@ -171,7 +163,17 @@ gapply.groupr <- function(groupr, new_functions, is_cbind = F) {
   })
 
   top_applied$meta <- groupr$meta
+  top_applied$meta$new_functions <- new_functions
   top_applied <- structure(top_applied, class = "groupr")
   return(top_applied)
+}
+
+check_functions <- function(fn_list){
+  if (is.null(names(fn_list)))
+    stop("Functions must be named")
+
+  for (i in fn_list)
+    if (!identical(formalArgs(i), "df"))
+      stop("Functions must take only one argument, named df")
 }
 

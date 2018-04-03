@@ -113,6 +113,7 @@ xts_to_arima_model <-
     if (parallelize) {
       core_count <- parallel::detectCores() - 1
       cl <- parallel::makeCluster(core_count)
+      parallel::clusterExport(cl, list("make_ts"))
       arima_mdls <-
         function(df)
           parallel::parApply(
@@ -143,31 +144,51 @@ xts_to_arima_model <-
   }
 
 do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
-  index   <- as.Date(names(xts_column))
-  index_year    <- lubridate::year(xts::first(index))
-  index_month   <- lubridate::month(xts::first(index))
-  index_day     <- lubridate::day(xts::first(index))
 
-  if (interval == "month")
-    ts_data <-
-    stats::ts(xts_column,
-              frequency = 12,
-              start = c(index_year, index_month))
-  else if (interval == "week")
-    ts_data <- stats::ts(xts_column, frequency = 52)
-  else if (interval == "day")
-    ts_data <- stats::ts(xts_column, frequency = 7)
-  else if (is.numeric(interval))
-    ts_data <- stats::ts(xts_column, frequency = interval)
-  else
-    stop("Bad interval choice")
+  ts_data <- make_ts(xts_column, interval)
 
   if (is_auto_arima)
     model <- forecast::auto.arima(ts_data)
   else
     model <- forecast::Arima(y = ts_data, ...)
+  return(model)
+}
 
-  model
+fill_xts <- function(xts_ser, interval, fill_val = 0){
+  dt_range <- range(zoo::index(xts_ser))
+  dt_seq <- seq.Date(from = dt_range[1], to = dt_range[2], by = interval)
+  zeros <- xts::xts(rep(0, length(dt_seq)), order.by = dt_seq)
+  merged <- zoo::merge.zoo(zeros, xts_ser)
+  out <- merged[ ,2]
+  out[is.na(out)] <- fill_val
+  out <- xts::as.xts(out)
+  return(out)
+}
+
+make_ts <- function(xts_column, interval){
+  index   <- as.Date(names(xts_column))
+  first_ind <- xts::first(index)
+  ind_ymd <- lubridate::ymd(first_ind)
+  st <- lubridate::decimal_date(first_ind)
+
+  index_year    <- lubridate::year(first_ind)
+  index_month   <- lubridate::month(first_ind)
+  index_day     <- lubridate::day(first_ind)
+  time_list <- list(year = index_year,
+                    month = index_month,
+                    day = index_day)
+
+  if (interval == "month")
+    ts_data <- stats::ts(xts_column, frequency = 12, start = st)
+  else if (interval == "week")
+    ts_data <- stats::ts(xts_column, frequency = 52, start = st)
+  else if (interval == "day")
+    ts_data <- stats::ts(xts_column, frequency = 365, start = st)
+  else if (is.numeric(interval))
+    ts_data <- stats::ts(xts_column, frequency = interval, start = st)
+  else
+    stop("Bad interval choice")
+  return(ts_data)
 }
 
 clean_extracted_groupr <- function(groupr) {
