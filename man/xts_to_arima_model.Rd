@@ -4,11 +4,11 @@
 \alias{xts_to_arima_model}
 \title{Model time series list with ARIMA}
 \usage{
-xts_to_arima_model(xts_gr_obj, ..., is_auto_arima = TRUE,
+xts_to_arima_model(xts_groupr, ..., is_auto_arima = TRUE,
   parallelize = FALSE, interval = "month")
 }
 \arguments{
-\item{xts_gr_obj}{A list of \code{xts} data produced with \code{extract_xts}.}
+\item{xts_groupr}{A \code{groupr} object produced with \code{extract_xts}.}
 
 \item{...}{Arguments to be passed to \code{Arima} function (from the
 \code{forecast} package).}

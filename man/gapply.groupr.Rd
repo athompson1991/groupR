@@ -23,9 +23,8 @@ perform additional analysis using the data produced. For example, a
 \code{groupr} object could be used to count the number of employees in an
 organization and get their total tenure, as broken out by various groups
 (state, full/part time, etc.). A natural, additional calculation could be an
-total tenure divided by count, applied to all the resultant data frames. This
-function is generalized so that any function with one argument (\code{df})
-can be passed.
+total tenure divided by count. This function is generalized so that any
+function with one argument (\code{df}) can be passed.
 }
 \examples{
 permits_groupr <- groupr(

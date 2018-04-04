@@ -102,7 +102,7 @@ rename_xts_list <- function(xts_list, date_column){
 #'
 #'
 #' @export
-#' @param xts_gr_obj A list of \code{xts} data produced with \code{extract_xts}.
+#' @param xts_groupr A \code{groupr} object produced with \code{extract_xts}.
 #' @param ... Arguments to be passed to \code{Arima} function (from the
 #'   \code{forecast} package).
 #' @param is_auto_arima A boolean value to either specify a model explicitly or
