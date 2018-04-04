@@ -31,22 +31,24 @@
 #'   date_column = "issued_month"
 #' )
 extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
+
   groups <- get_groups(groupr)
-  groups <- groups[groups != date_column]
+  non_date_groups <- groups[groups != date_column]
+  new_meta <- groupr$meta
+  new_meta$groups <- non_date_groups
+  new_meta$date_column <- date_column
   core <- drop_grouping_level(groupr, length(groupr))
   fixed_groupr <- subset(core, date_column, type = "intersect")
-  out <- lapply(fixed_groupr, function(grouping_level) {
+
+  top_applied <- lapply(fixed_groupr, function(grouping_level) {
     xts_list <- lapply(grouping_level, function(df) {
       column_names <- colnames(df)
       return_xts <- NULL
       is_overall <- setequal(column_names, c(date_column, value_choice))
-      if (is_overall) {
-        date_index <- which(colnames(df) == date_column)
-        series <- df[, -date_index]
-        order_by <- dplyr::pull(df, date_column)
-        return_xts <- xts::xts(series, order.by = order_by)
-      } else{
-        logic <- which(column_names %in% groups)
+      if (is_overall)
+        return_xts <- df_to_xts(df, date_column, is_overall = T)
+      else{
+        logic <- which(column_names %in% non_date_groups)
         groups_subset <- column_names[logic]
         collapse <- paste(groups_subset, collapse = "+")
         formula_text <- paste(date_column, "~", collapse)
@@ -57,36 +59,42 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
                           casting_formula,
                           fun.aggregate = sum,
                           value = value_choice)
-          date_index <- which(colnames(casted_df) == date_column)
-          order_by <- casted_df[, date_index]
-          series <- casted_df[, -date_index]
-          return_xts <- xts::xts(x = series, order.by = order_by)
+          return_xts <- df_to_xts(casted_df, date_column)
           new_colnames <- new_xts_names(df, groups_subset)
-          if (length(new_colnames) == ncol(return_xts))
-            colnames(return_xts) <- new_colnames
+          colnames(return_xts) <- new_colnames
         }
       }
       return(return_xts)
     })
-    d1 <- "(\\.\\.\\.*"
-    d2 <- "*\\.\\.\\.)"
-    replace <- paste0(d1, date_column, ")|(", date_column, d2)
-    names(xts_list) <-
-      gsub(names(xts_list),
-           pattern = replace,
-           replacement = "")
+    xts_list <- rename_xts_list(xts_list, date_column)
     xts_list[sapply(xts_list, is.null)] <- NULL
     return(xts_list)
   })
 
-  out <- clean_extracted_groupr(out)
-  new_meta <- groupr$meta
-  new_meta$groups <- new_meta$groups[new_meta$groups != date_column]
-  new_meta$date_column <- date_column
-  out$meta <- new_meta
+  top_applied <- clean_extracted_groupr(top_applied)
+  top_applied$meta <- new_meta
 
-  out <- as.xts_groupr(out)
+  top_applied <- as.xts_groupr(top_applied)
+  return(top_applied)
+}
+
+df_to_xts <- function(df, date_column, is_overall = F) {
+  date_index <- which(colnames(df) == date_column)
+  if(is_overall)
+    order_by <- dplyr::pull(df, date_column)
+  else
+    order_by <- df[, date_index]
+  series <- df[, -date_index]
+  out <- xts::xts(x = series, order.by = order_by)
   return(out)
+}
+
+rename_xts_list <- function(xts_list, date_column){
+  d1 <- "(\\.\\.\\.*"
+  d2 <- "*\\.\\.\\.)"
+  replace <- paste0(d1, date_column, ")|(", date_column, d2)
+  names(xts_list) <- gsub(names(xts_list), pattern = replace, replacement = "")
+  return(xts_list)
 }
 
 #' Model time series list with ARIMA
@@ -104,55 +112,28 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
 #' @param interval Either "month", "week", or "day" for calculation.
 #'   Alternatively, you can provide a numeric value to be passed to
 #'   \code{frequency} for the \code{ts} object.
-xts_to_arima_model <-
-  function(xts_gr_obj,
-           ...,
-           is_auto_arima = TRUE,
-           parallelize = FALSE,
-           interval = "month") {
+xts_to_arima_model <- function(xts_groupr, ..., is_auto_arima = TRUE,
+           parallelize = FALSE, interval = "month") {
     if (parallelize) {
       core_count <- parallel::detectCores() - 1
       cl <- parallel::makeCluster(core_count)
-      parallel::clusterExport(cl, list("make_ts"))
+      parallel::clusterExport(cl, list("make_ts", "fill_xts"))
       arima_mdls <-
         function(df)
-          parallel::parApply(
-            cl,
-            df,
-            2,
-            FUN = do_modeling,
-            ... = ...,
-            is_auto_arima = is_auto_arima,
-            interval = interval
+          parallel::parApply(cl, df, 2, FUN = do_modeling, ... = ...,
+                             is_auto_arima = is_auto_arima, interval = interval
           )
     }
     else
-      arima_mdls  <-
-        function(df)
-          apply(
-            df,
-            2,
-            do_modeling,
-            ... = ...,
-            is_auto_arima = is_auto_arima,
-            interval = interval
-          )
-    out <- gapply(xts_gr_obj, list(mdl = arima_mdls), is_cbind = F)
+      arima_mdls  <- function(df)
+          apply(df, 2, do_modeling, ...  = ...,
+                is_auto_arima = is_auto_arima,interval = interval)
+    out <- gapply(xts_groupr, list(mdl = arima_mdls), is_cbind = F)
+
     if (parallelize)
       parallel::stopCluster(cl)
     return(out)
   }
-
-do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
-
-  ts_data <- make_ts(xts_column, interval)
-
-  if (is_auto_arima)
-    model <- forecast::auto.arima(ts_data)
-  else
-    model <- forecast::Arima(y = ts_data, ...)
-  return(model)
-}
 
 fill_xts <- function(xts_ser, interval, fill_val = 0){
   dt_range <- range(zoo::index(xts_ser))
@@ -163,6 +144,17 @@ fill_xts <- function(xts_ser, interval, fill_val = 0){
   out[is.na(out)] <- fill_val
   out <- xts::as.xts(out)
   return(out)
+}
+
+do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
+
+  ts_data <- make_ts(xts_column, interval)
+
+  if (is_auto_arima)
+    model <- forecast::auto.arima(ts_data)
+  else
+    model <- forecast::Arima(y = ts_data, ...)
+  return(model)
 }
 
 make_ts <- function(xts_column, interval){

@@ -82,14 +82,14 @@ test_that("fill_xts works for day, week, month", {
     int = intervals[i]
     end <- end_dates[i]
     dates <- seq.Date(from = start, to = end, by = int)
-    messy <- xts::xts(rnorm(5), order.by = dates[-3])
+    messy1 <- xts::xts(rnorm(5), order.by = dates[-3])
+    messy2 <- xts::xts(runif(5), order.by = dates[-3])
+    merged <- merge(messy1, messy2)
 
-    # Test
-    expect_equal(
-      zoo::index(fill_xts(messy, int)),
-      dates,
-      check.attributes = F
-    )
-    expect_identical(as.vector(fill_xts(messy, int))[3], 0)
+    # Tests
+    expect_equal(zoo::index(fill_xts(messy1, int)), dates, check.attributes = F)
+    expect_equal(zoo::index(fill_xts(merged, int)), dates, check.attributes = F)
+    expect_equal(as.vector(fill_xts(messy1, int))[3], 0)
+    expect_equal(as.vector(fill_xts(messy1, int, fill_val = NA))[3], as.numeric(NA))
   }
 })

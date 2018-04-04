@@ -112,9 +112,8 @@ get_functions <- function(groupr){
 #' \code{groupr} object could be used to count the number of employees in an
 #' organization and get their total tenure, as broken out by various groups
 #' (state, full/part time, etc.). A natural, additional calculation could be an
-#' total tenure divided by count, applied to all the resultant data frames. This
-#' function is generalized so that any function with one argument (\code{df})
-#' can be passed.
+#' total tenure divided by count. This function is generalized so that any
+#' function with one argument (\code{df}) can be passed.
 #'
 #' @export
 #' @importFrom magrittr "%>%"
@@ -138,7 +137,6 @@ get_functions <- function(groupr){
 #' )
 #' extract_df(applied_groupr, "existing_const_type")
 gapply.groupr <- function(groupr, new_functions, is_cbind = F) {
-  raw_names <- names(new_functions)
   check_functions(new_functions)
   core <- drop_grouping_level(groupr, length(groupr))
 
@@ -146,16 +144,16 @@ gapply.groupr <- function(groupr, new_functions, is_cbind = F) {
     group_level_applied <- lapply(df_list, function(df) {
       has_no_columns <- is.null(ncol(df))
       if (!has_no_columns) {
-        df_level <- lapply(new_functions, function(f) {
-          temp_data <- do.call(f, list(df))
+        calcs <- lapply(new_functions, function(calc) {
+          temp_data <- do.call(calc, list(df))
           return(temp_data)
         })
         if (is_cbind) {
-          new_data <- do.call(cbind, df_level)
+          new_data <- do.call(cbind, calcs)
           df <- cbind(as.data.frame(df), as.data.frame(new_data))
           return_this <- df
         } else
-          return_this <- df_level
+          return_this <- calcs
         return(return_this)
       }
     })
