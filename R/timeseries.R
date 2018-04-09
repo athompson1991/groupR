@@ -44,15 +44,9 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
       else{
         logic <- which(column_names %in% init$groups)
         groups_subset <- column_names[logic]
-        plus <- paste(groups_subset, collapse = "+")
-        formula_text <- paste(date_column, "~", plus)
         if (length(groups_subset) > 0) {
-          casting_formula <- as.formula(formula_text)
-          casted_df <- reshape::cast(
-            data = df,
-            formula = casting_formula,
-            fun.aggregate = sum,
-            value = value_choice
+          casted_df <- do_extract(
+            groups_subset, date_column, df, value_choice
           )
           return_xts <- df_to_xts(casted_df, date_column)
           colnames(return_xts) <- new_xts_names(df, groups_subset)
@@ -69,6 +63,19 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
   top_applied$meta <- init$new_meta
   top_applied <- as.xts_groupr(top_applied)
   return(top_applied)
+}
+
+do_extract <- function(groups, date_column, df, value_choice) {
+  plus <- paste(groups, collapse = "+")
+  formula_text <- paste(date_column, "~", plus)
+  casting_formula <- as.formula(formula_text)
+  casted_df <- reshape::cast(
+    data = df,
+    formula = casting_formula,
+    fun.aggregate = sum,
+    value = value_choice
+  )
+  return(casted_df)
 }
 
 make_init_list <- function(groupr, date_column){
@@ -121,22 +128,25 @@ rename_xts_list <- function(xts_list, date_column){
 #' @param interval Either "month", "week", or "day" for calculation.
 #'   Alternatively, you can provide a numeric value to be passed to
 #'   \code{frequency} for the \code{ts} object.
-xts_to_arima_model <- function(xts_groupr, ..., is_auto_arima = TRUE,
-           parallelize = FALSE, interval = "month") {
+xts_to_arima_model <- function(
+  xts_groupr,
+  ...,
+  is_auto_arima = TRUE,
+  parallelize = FALSE,
+  interval = "month"
+  ) {
     if (parallelize) {
       core_count <- parallel::detectCores() - 1
       cl <- parallel::makeCluster(core_count)
       parallel::clusterExport(cl, list("make_ts", "fill_xts"))
-      arima_mdls <-
-        function(df)
-          parallel::parApply(cl, df, 2, FUN = do_modeling, ... = ...,
-                             is_auto_arima = is_auto_arima, interval = interval
-          )
+      arima_mdls <- function(df)
+        parallel::parApply(cl, df, 2, FUN = do_modeling, ... = ...,
+                           is_auto_arima = is_auto_arima, interval = interval)
     }
     else
       arima_mdls  <- function(df)
-          apply(df, 2, do_modeling, ...  = ...,
-                is_auto_arima = is_auto_arima,interval = interval)
+        apply(df, 2, do_modeling, ...  = ...,
+              is_auto_arima = is_auto_arima, interval = interval)
     out <- gapply(xts_groupr, list(mdl = arima_mdls), is_cbind = F)
 
     if (parallelize)

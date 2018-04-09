@@ -20,10 +20,7 @@
 #' summary(as.factor(permits$type_desc))
 #' permits_cleaned <- other_label(permits, "type_desc")
 #' summary(as.factor(permits_cleaned$type_desc))
-other_label <- function(df,
-                        column,
-                        percentile = 0.9,
-                        custom = NULL) {
+other_label <- function(df, column, percentile = 0.9, custom = NULL) {
   work_vector <- df[, column]
   if (is.character(work_vector))
     work_vector <- as.factor(work_vector)
@@ -162,15 +159,20 @@ extract_drop_util <- function(groupr, groups, return_type) {
 subset.groupr <- function(groupr, groups, type = "intersect"){
   worked_on <- lapply(groupr[-1], function(level){
     if(type == "intersect")
-      return_dfs <- sapply(level, function(df) all(groups %in% colnames(df)))
+      return_dfs <- sapply(level, function(df)
+        all(groups %in% colnames(df)))
     else if(type == "union")
-      return_dfs <- sapply(level, function(df) any(groups %in% colnames(df)))
+      return_dfs <- sapply(level, function(df)
+        any(groups %in% colnames(df)))
     else if(type == "except_intersect")
-      return_dfs <- sapply(level, function(df) !all(groups %in% colnames(df)))
+      return_dfs <- sapply(level, function(df)
+        !all(groups %in% colnames(df)))
     else if(type == "except_union")
-      return_dfs <- sapply(level, function(df) !any(groups %in% colnames(df)))
+      return_dfs <- sapply(level, function(df)
+        !any(groups %in% colnames(df)))
     else
-      stop("Bad type, must be intersect, union, except_intersect, or except_union")
+      stop("Bad type, must be intersect, union,
+           except_intersect, or except_union")
     fixed_level <- level[return_dfs]
     return(fixed_level)
   })
