@@ -32,15 +32,9 @@
 #' )
 extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
 
-  groups <- get_groups(groupr)
-  non_date_groups <- groups[groups != date_column]
-  new_meta <- groupr$meta
-  new_meta$groups <- non_date_groups
-  new_meta$date_column <- date_column
-  core <- drop_grouping_level(groupr, length(groupr))
-  fixed_groupr <- subset(core, date_column, type = "intersect")
+  init <- make_init_list(groupr, date_column)
 
-  top_applied <- lapply(fixed_groupr, function(grouping_level) {
+  top_applied <- lapply(init$fgroupr, function(grouping_level) {
     xts_list <- lapply(grouping_level, function(df) {
       column_names <- colnames(df)
       return_xts <- NULL
@@ -48,20 +42,20 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
       if (is_overall)
         return_xts <- df_to_xts(df, date_column, is_overall = T)
       else{
-        logic <- which(column_names %in% non_date_groups)
+        logic <- which(column_names %in% init$groups)
         groups_subset <- column_names[logic]
-        collapse <- paste(groups_subset, collapse = "+")
-        formula_text <- paste(date_column, "~", collapse)
+        plus <- paste(groups_subset, collapse = "+")
+        formula_text <- paste(date_column, "~", plus)
         if (length(groups_subset) > 0) {
           casting_formula <- as.formula(formula_text)
-          casted_df <-
-            reshape::cast(df,
-                          casting_formula,
-                          fun.aggregate = sum,
-                          value = value_choice)
+          casted_df <- reshape::cast(
+            data = df,
+            formula = casting_formula,
+            fun.aggregate = sum,
+            value = value_choice
+          )
           return_xts <- df_to_xts(casted_df, date_column)
-          new_colnames <- new_xts_names(df, groups_subset)
-          colnames(return_xts) <- new_colnames
+          colnames(return_xts) <- new_xts_names(df, groups_subset)
         }
       }
       return(return_xts)
@@ -72,10 +66,25 @@ extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
   })
 
   top_applied <- clean_extracted_groupr(top_applied)
-  top_applied$meta <- new_meta
-
+  top_applied$meta <- init$new_meta
   top_applied <- as.xts_groupr(top_applied)
   return(top_applied)
+}
+
+make_init_list <- function(groupr, date_column){
+  groups <- get_groups(groupr)
+  groups <- groups[groups != date_column]
+  new_meta <- groupr$meta
+  new_meta$groups <- groups
+  new_meta$date_column <- date_column
+  core <- drop_grouping_level(groupr, length(groupr))
+  fixed_groupr <- subset(core, date_column, type = "intersect")
+  out <- list(
+    groups = groups,
+    new_meta = new_meta,
+    fgroupr = fixed_groupr
+  )
+  return(out)
 }
 
 df_to_xts <- function(df, date_column, is_overall = F) {
