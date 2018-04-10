@@ -96,27 +96,48 @@ test_that("fill_xts works for day, week, month", {
 
 test_that("make_ts produces as expected", {
 
-  # Daily
-  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "day")
-  test_xts <- xts::xts(rnorm(100), order.by = dates)
-  test_ts <- make_ts(test_xts, interval = "day")
-  expect_equal(tsp(test_ts), c(2016.000, 2016.273, 365.25), tolerance = 0.0001)
+  intervals = rep(c("day", "week", "month"), 2)
+  cycles = rep(c("annual", "week"), each = 3)
+  start_values <- rep(c(2016.000, 1), each = 3)
+  end_values <- c(2016.273, 2017.89733, 2024.25, 15.143, NA, NA)
+  frequencies <- c(365.25, 52.17857, 12.00, 7.00, NA, NA)
 
-  # Weekly
-  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "week")
-  test_xts <- xts::xts(rnorm(100), order.by = dates)
-  test_ts <- make_ts(test_xts, interval = "week")
-  expect_equal(tsp(test_ts), c(2016.000, 2017.89733, 52.17857), tolerance = 0.0001)
+  test_df <- data.frame(
+    stringsAsFactors = F,
+    intervals,
+    cycles,
+    start_values,
+    end_values,
+    frequencies
+  )
 
-  # Monthly
-  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "month")
-  test_xts <- xts::xts(rnorm(100), order.by = dates)
-  test_ts <- make_ts(test_xts, interval = "month")
-  expect_equal(tsp(test_ts), c(2016.000, 2024.25, 12.00), tolerance = 0.0001)
+  # Annual Tests
+
+  for(i in 1:3){
+    row <- test_df[i, ]
+    start <- as.Date("2016-01-01")
+    dates <- seq(start, length.out = 100, by = row[["intervals"]])
+    test_xts <- xts::xts(rnorm(100), order.by = dates)
+    test_ts <- make_ts(test_xts, interval = row[["intervals"]])
+    test_tsp <- tsp(test_ts)
+    expect_tsp <- c(row[["start_values"]], row[["end_values"]], row[["frequencies"]])
+    expect_equal(test_tsp, expect_tsp, tolerance = 0.0001)
+  }
 
   # Custom
   dates <- seq(as.Date("2016-01-01"), length.out = 100, by = 4)
   test_xts <- xts::xts(rnorm(100), order.by = dates)
   test_ts <- make_ts(test_xts, interval = 4)
   expect_equal(tsp(test_ts), c(2016.000, 2040.75, 4.00), tolerance = 0.0001)
+
+  # Weekly Tests
+
+  # Daily
+  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "day")
+  test_xts <- xts::xts(rnorm(100), order.by = dates)
+  test_ts <- make_ts(test_xts, interval = "day", cycle = "week")
+  expect_equal(tsp(test_ts), c(1.000, 15.143, 7.00), tolerance = 0.0001)
+
+  # Error
+  expect_error(make_ts(test_xts, "potato"), "Bad interval choice")
 })

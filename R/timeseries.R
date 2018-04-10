@@ -179,21 +179,26 @@ do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
   return(model)
 }
 
-make_ts <- function(xts_column, interval = "day"){
+make_ts <- function(xts_column, interval = "month", cycle = "year"){
   index   <- zoo::index(xts_column)
   first_ind <- xts::first(index)
-  start <- lubridate::decimal_date(first_ind)
 
-  if (interval == "month")
-    ts_data <- stats::ts(xts_column, frequency = 12, start = start)
-  else if (interval == "week")
-    ts_data <- stats::ts(xts_column, frequency = 365.25 / 7, start = start)
-  else if (interval == "day")
-    ts_data <- stats::ts(xts_column, frequency = 365.25, start = start)
-  else if (is.numeric(interval))
-    ts_data <- stats::ts(xts_column, frequency = interval, start = start)
-  else
-    stop("Bad interval choice")
+  if(cycle == "year") {
+    start <- lubridate::decimal_date(first_ind)
+    if (interval == "month")
+      ts_data <- stats::ts(xts_column, frequency = 12, start = start)
+    else if (interval == "week")
+      ts_data <- stats::ts(xts_column, frequency = 365.25 / 7, start = start)
+    else if (interval == "day")
+      ts_data <- stats::ts(xts_column, frequency = 365.25, start = start)
+    else if (is.numeric(interval))
+      ts_data <- stats::ts(xts_column, frequency = interval, start = start)
+    else
+      stop("Bad interval choice")
+  } else if(cycle == "week") {
+    if (interval == "day")
+      ts_data <- stats::ts(xts_column, frequency = 7, start = 1)
+  }
 
   return(ts_data)
 }
