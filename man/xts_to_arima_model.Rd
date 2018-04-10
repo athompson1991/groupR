@@ -2,7 +2,7 @@
 % Please edit documentation in R/timeseries.R
 \name{xts_to_arima_model}
 \alias{xts_to_arima_model}
-\title{Model time series list with ARIMA}
+\title{Model with ARIMA}
 \usage{
 xts_to_arima_model(xts_groupr, ..., is_auto_arima = TRUE,
   parallelize = FALSE, interval = "month")
@@ -24,5 +24,7 @@ Alternatively, you can provide a numeric value to be passed to
 \code{frequency} for the \code{ts} object.}
 }
 \description{
-Model time series list with ARIMA
+This function allows the user to model all the combinations of \code{xts}
+observations extracted using \code{extract_xts}. Because there can be many
+columns in an \code{xts_groupr} object, there is the option to do model estimation in parallel.
 }

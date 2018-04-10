@@ -1,10 +1,11 @@
 #' Create groupr object.
 #'
-#' This function takes a data frame as input and returns a grouping object as
-#' output. The grouping object is a list of lists of data frames, one data frame
-#' for every possible combination of groups. For example, if there are two
-#' groups, A and B, four data frames are returned: data frames for A, B, both A
-#' and B, and a data frame summarizing the whole dataset.
+#' Constructor function for \code{groupr} object. This function takes a data
+#' frame as input and returns a grouping object as output. The \code{groupr} is
+#' essentially a list of lists of data frames, one data frame for every possible
+#' combination of groups. For example, if there are two groups, A and B, four
+#' data frames are returned: data frames for A, B, both A and B, and a data
+#' frame summarizing the whole dataset.
 #'
 #' @export
 #' @importFrom utils tail
@@ -96,14 +97,12 @@ overall_calc <- function(functions, df){
 #'
 #' @param groupr The \code{groupr} object in question
 #' @export
-get_groups <- function(groupr){
+get_groups <- function(groupr)
   return(names(groupr$n_1_group))
-}
 
 #' @rdname get_groups
-get_functions <- function(groupr){
+get_functions <- function(groupr)
   return(groupr$meta$functions)
-}
 
 #' Perform function(s) on grouping object.
 #'

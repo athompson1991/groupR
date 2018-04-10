@@ -132,7 +132,6 @@ reassign_overall_df <- function(original, worked_on){
   }
 }
 
-
 extract_drop_util <- function(groupr, groups, return_type) {
   return_this <- NULL
   work_groupr <- drop_overall_df(groupr)

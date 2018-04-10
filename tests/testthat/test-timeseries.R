@@ -93,3 +93,30 @@ test_that("fill_xts works for day, week, month", {
     expect_equal(as.vector(fill_xts(messy1, int, fill_val = NA))[3], as.numeric(NA))
   }
 })
+
+test_that("make_ts produces as expected", {
+
+  # Daily
+  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "day")
+  test_xts <- xts::xts(rnorm(100), order.by = dates)
+  test_ts <- make_ts(test_xts, interval = "day")
+  expect_equal(tsp(test_ts), c(2016.000, 2016.273, 365.25), tolerance = 0.0001)
+
+  # Weekly
+  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "week")
+  test_xts <- xts::xts(rnorm(100), order.by = dates)
+  test_ts <- make_ts(test_xts, interval = "week")
+  expect_equal(tsp(test_ts), c(2016.000, 2017.89733, 52.17857), tolerance = 0.0001)
+
+  # Monthly
+  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = "month")
+  test_xts <- xts::xts(rnorm(100), order.by = dates)
+  test_ts <- make_ts(test_xts, interval = "month")
+  expect_equal(tsp(test_ts), c(2016.000, 2024.25, 12.00), tolerance = 0.0001)
+
+  # Custom
+  dates <- seq(as.Date("2016-01-01"), length.out = 100, by = 4)
+  test_xts <- xts::xts(rnorm(100), order.by = dates)
+  test_ts <- make_ts(test_xts, interval = 4)
+  expect_equal(tsp(test_ts), c(2016.000, 2040.75, 4.00), tolerance = 0.0001)
+})

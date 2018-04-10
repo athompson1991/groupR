@@ -113,9 +113,11 @@ rename_xts_list <- function(xts_list, date_column){
   return(xts_list)
 }
 
-#' Model time series list with ARIMA
+#' Model with ARIMA
 #'
-#'
+#' This function allows the user to model all the combinations of \code{xts}
+#' observations extracted using \code{extract_xts}. Because there can be many
+#' columns in an \code{xts_groupr} object, there is the option to do model estimation in parallel.
 #'
 #' @export
 #' @param xts_groupr A \code{groupr} object produced with \code{extract_xts}.
@@ -152,21 +154,22 @@ xts_to_arima_model <- function(
     if (parallelize)
       parallel::stopCluster(cl)
     return(out)
-  }
+}
 
-fill_xts <- function(xts_ser, interval, fill_val = 0){
-  dt_range <- range(zoo::index(xts_ser))
-  dt_seq <- seq.Date(from = dt_range[1], to = dt_range[2], by = interval)
+fill_xts <- function(xts_series, interval, fill_val = 0) {
+  date_range <- range(zoo::index(xts_series))
+  dt_seq <- seq.Date(
+    from = date_range[1], to = date_range[2],
+    by = interval)
   zeros <- xts::xts(rep(0, length(dt_seq)), order.by = dt_seq)
-  merged <- zoo::merge.zoo(zeros, xts_ser)
-  out <- merged[ ,2]
+  merged <- zoo::merge.zoo(zeros, xts_series)
+  out <- merged[, 2]
   out[is.na(out)] <- fill_val
   out <- xts::as.xts(out)
   return(out)
 }
 
 do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
-
   ts_data <- make_ts(xts_column, interval)
 
   if (is_auto_arima)
@@ -176,29 +179,22 @@ do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
   return(model)
 }
 
-make_ts <- function(xts_column, interval){
-  index   <- as.Date(names(xts_column))
+make_ts <- function(xts_column, interval = "day"){
+  index   <- zoo::index(xts_column)
   first_ind <- xts::first(index)
-  ind_ymd <- lubridate::ymd(first_ind)
-  st <- lubridate::decimal_date(first_ind)
-
-  index_year    <- lubridate::year(first_ind)
-  index_month   <- lubridate::month(first_ind)
-  index_day     <- lubridate::day(first_ind)
-  time_list <- list(year = index_year,
-                    month = index_month,
-                    day = index_day)
+  start <- lubridate::decimal_date(first_ind)
 
   if (interval == "month")
-    ts_data <- stats::ts(xts_column, frequency = 12, start = st)
+    ts_data <- stats::ts(xts_column, frequency = 12, start = start)
   else if (interval == "week")
-    ts_data <- stats::ts(xts_column, frequency = 52, start = st)
+    ts_data <- stats::ts(xts_column, frequency = 365.25 / 7, start = start)
   else if (interval == "day")
-    ts_data <- stats::ts(xts_column, frequency = 365, start = st)
+    ts_data <- stats::ts(xts_column, frequency = 365.25, start = start)
   else if (is.numeric(interval))
-    ts_data <- stats::ts(xts_column, frequency = interval, start = st)
+    ts_data <- stats::ts(xts_column, frequency = interval, start = start)
   else
     stop("Bad interval choice")
+
   return(ts_data)
 }
 

@@ -21,11 +21,12 @@ A grouping object (list that aggregates functions by every potential
   combination)
 }
 \description{
-This function takes a data frame as input and returns a grouping object as
-output. The grouping object is a list of lists of data frames, one data frame
-for every possible combination of groups. For example, if there are two
-groups, A and B, four data frames are returned: data frames for A, B, both A
-and B, and a data frame summarizing the whole dataset.
+Constructor function for \code{groupr} object. This function takes a data
+frame as input and returns a grouping object as output. The \code{groupr} is
+essentially a list of lists of data frames, one data frame for every possible
+combination of groups. For example, if there are two groups, A and B, four
+data frames are returned: data frames for A, B, both A and B, and a data
+frame summarizing the whole dataset.
 }
 \examples{
 default_data <- data.frame(
