@@ -140,4 +140,7 @@ test_that("make_ts produces as expected", {
 
   # Error
   expect_error(make_ts(test_xts, "potato"), "Bad interval choice")
+  expect_error(make_ts(test_xts, interval = "potato", cycle = "week"), "Bad interval choice")
+  expect_error(make_ts(test_xts, interval = "potato", cycle = "year"), "Bad interval choice")
+  expect_error(make_ts(test_xts, interval = "week", cycle = "potato"), "Bad cycle choice")
 })

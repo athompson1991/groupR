@@ -183,6 +183,18 @@ make_ts <- function(xts_column, interval = "month", cycle = "year"){
   index   <- zoo::index(xts_column)
   first_ind <- xts::first(index)
 
+  valid_intervals <- c("month", "week", "day")
+  valid_cycles <- c("year", "week")
+  bad_interval <- !(interval %in%  valid_intervals | is.numeric(interval))
+  bad_cycle <- !(cycle %in% valid_cycles)
+
+  if(bad_interval)
+    stop("Bad interval choice")
+
+  if(bad_cycle)
+    stop("Bad cycle choice")
+
+
   if(cycle == "year") {
     start <- lubridate::decimal_date(first_ind)
     if (interval == "month")
