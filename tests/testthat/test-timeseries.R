@@ -15,10 +15,36 @@ extracted_groupr <- extract_xts(
 )
 
 test_that("get_groups returns correct names", {
-  expect_identical(get_groups(extracted_groupr),
-                   c("companies", "states", "department"))
+  expect_identical(
+    get_groups(extracted_groupr),
+    c("companies", "states", "department")
+  )
 })
 
+test_that("fill_xts works as expected", {
+  set.seed(1000)
+  start <- as.Date("2017-01-01")
+
+  intervals <- c("day", "week", "month", "quarter", "year")
+  end_dates <- as.Date(c(
+    "2017-01-06", "2017-02-06", "2017-06-01", "2018-06-01", "2022-01-01"
+    ))
+
+  for(i in 1:length(intervals)){
+    end_date <- end_dates[i]
+    interval = intervals[i]
+    date_seq <- seq.Date(from = start, to = end_date, by = interval)
+    messy_xts <- xts::xts(rnorm(5), order.by = date_seq[-3])
+    filled <- fill_xts(messy_xts, interval = interval)
+
+    expect_equal(class(filled), c("xts", "zoo"))
+    expect_equal(filled[[3]], 0)
+    expect_equal(summary(as.factor(filled == 0))["TRUE"], 1, check.names = F)
+
+    filled <- fill_xts(messy_xts, interval = interval, fill_val = NA)
+    expect_output(filled[[3]], NA)
+  }
+})
 
 test_that("extract_xts gives right group level names", {
   expect_identical(

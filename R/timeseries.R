@@ -135,20 +135,25 @@ xts_to_arima_model <- function(
   ...,
   is_auto_arima = TRUE,
   parallelize = FALSE,
-  interval = "month"
+  interval = "month",
+  cycle = "annual"
   ) {
     if (parallelize) {
       core_count <- parallel::detectCores() - 1
       cl <- parallel::makeCluster(core_count)
       parallel::clusterExport(cl, list("make_ts", "fill_xts"))
       arima_mdls <- function(df)
-        parallel::parApply(cl, df, 2, FUN = do_modeling, ... = ...,
-                           is_auto_arima = is_auto_arima, interval = interval)
+        parallel::parApply(
+          cl, df, 2, FUN = do_modeling, ... = ...,
+          is_auto_arima = is_auto_arima, interval = interval, cycle = cycle
+        )
     }
     else
       arima_mdls  <- function(df)
-        apply(df, 2, do_modeling, ...  = ...,
-              is_auto_arima = is_auto_arima, interval = interval)
+        apply(
+          df, 2, do_modeling, ...  = ...,
+          is_auto_arima = is_auto_arima, interval = interval
+        )
     out <- gapply(xts_groupr, list(mdl = arima_mdls), is_cbind = F)
 
     if (parallelize)
@@ -157,6 +162,10 @@ xts_to_arima_model <- function(
 }
 
 fill_xts <- function(xts_series, interval, fill_val = 0) {
+  bad_interval = !(interval %in% c("day", "week", "month", "quarter", "year"))
+  if(bad_interval)
+    stop("Bad interval choice, see details in seq.Date documentation")
+
   date_range <- range(zoo::index(xts_series))
   dt_seq <- seq.Date(
     from = date_range[1], to = date_range[2],
@@ -169,8 +178,8 @@ fill_xts <- function(xts_series, interval, fill_val = 0) {
   return(out)
 }
 
-do_modeling <- function(xts_column, is_auto_arima = F, interval, ...) {
-  ts_data <- make_ts(xts_column, interval)
+do_modeling <- function(xts_column, is_auto_arima = F, interval, cycle, ...) {
+  ts_data <- make_ts(xts_column, interval = interval, cycle = cycle)
 
   if (is_auto_arima)
     model <- forecast::auto.arima(ts_data)
@@ -193,7 +202,6 @@ make_ts <- function(xts_column, interval = "month", cycle = "year"){
 
   if(bad_cycle)
     stop("Bad cycle choice")
-
 
   if(cycle == "year") {
     start <- lubridate::decimal_date(first_ind)
