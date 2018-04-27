@@ -1,5 +1,5 @@
 ---
-title: "Basic Usage"
+title: "How to Use"
 author: "Alex Thompson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -21,6 +21,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height
 library(groupR)
 ```
 
+## Intro
+
 Data analysis can require aggregation across any number of categories. For example, suppose you have employee-level data with state and job title for each employee; you may be asked to produce four different counts with such data: 
 
 - overall count
@@ -28,6 +30,61 @@ Data analysis can require aggregation across any number of categories. For examp
 - count by job title
 - count by both state and job title
 
-This kind of aggregation grows quickly as more groups are desired, and additional aggregations can complicate analysis (in SQL: sum, max, min, avg). Continuing with the employee example, a possible request from a manager could be counts by country, state, job title, gender, and company org, as well as an aggregation of average salary (median and mean), maximum age, and difference between median salary and mean salary. This is a complicated ask. Additionally, much of this work can be done using pivot tables in Excel, but some statistical methods - even something as simple as calculating the median - are unavailable using that tool, and many different pivot tables would need to be produced. The aim of this package is to simplify such analysis by doing the calculations all at once.
+This kind of aggregation grows quickly as more groups are desired, and
+additional aggregations can complicate analysis (in SQL: sum, max, min, avg).
+Continuing with the employee example, a possible request from a manager could be
+counts by country, state, job title, gender, and company org, as well as an
+aggregation of average salary (median and mean), maximum age, and difference
+between median salary and mean salary. This is a complicated ask. Additionally,
+much of this work can be done using pivot tables in Excel, but some statistical
+methods - even something as simple as calculating the median - are unavailable
+using that tool, and many different pivot tables would need to be produced. The
+aim of this package is to simplify such analysis by doing the calculations all
+at once.
 
-One thing worth pointing out is that aggregation like this requires granular data. Ideally - in a database sense - this means a table with a primary key; something along the lines of a unique row for every employee, customer, product, etc.
+One thing worth pointing out is that aggregation like this can require granular
+data. Ideally - in a database sense - this means a table with a primary key;
+something along the lines of a unique row for every employee, customer, product - 
+something that makes sense to aggregate which has not (necessarily) been aggregated already.
+
+## Basic Usage
+
+A dataset is included with San Francisco building permit information. This is an example of a 
+granular dataset one might want to aggregate. Let's take a quick look at the structure of the dataset
+(only first 5 columns included):
+
+```{r}
+permits[1:10, 1:5]
+
+# Check primary key
+length(unique(permits$permit_number)) == length(permits$permit_number)
+
+colnames(permits)
+
+str(permits)
+```
+
+Let's aggregate this data with a simple count of permits, as well as - just for demonstration purposes - the average `issued_date`, grouped by `location` and `existing_use`:
+
+```{r}
+permits <- permits[permits$location != "", ]
+permits_groupr <- groupr(
+  df = permits,
+  groups = c('location', 'existing_use'),
+  functions = list(count = 'n()', avg_date = 'mean(issued_date)')
+)
+permits_groupr
+
+# Overall aggregation
+permits_groupr$n_0_group
+
+# By location
+permits_groupr$n_1_group$location
+
+# By existing use
+extract_df(permits_groupr, "existing_use") # Alternate way to pull dataframe
+
+# By both
+extract_df(permits_groupr, c("location", "existing_use"))
+```
+
