@@ -1,5 +1,7 @@
 context("Core")
 
+# Set up
+
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
 
 test_groupr <- groupr(
@@ -14,6 +16,8 @@ simple_function_1 <- function(df) df$avg_salary / df$max_salary
 simple_function_2 <- function(df) df$avg_salary + 1
 new_functions <- list(percent_calc = simple_function_1, stupid_calc = simple_function_2)
 applied_obj <- gapply(test_groupr, new_functions = new_functions, is_cbind = T)
+
+# Tests
 
 test_that("groupr returns proper list", {
   expect_equal(names(test_groupr), c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta"))

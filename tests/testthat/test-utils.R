@@ -1,5 +1,7 @@
 context("Utils")
 
+# Set up
+
 function_list <- list(avg_salary = "mean(salary)", max_salary = "max(salary)")
 
 test_groupr <- groupr(
@@ -7,6 +9,8 @@ test_groupr <- groupr(
   groups = c("company", "party", "color"),
   functions = function_list
 )
+
+# Tests
 
 test_that("get_combinations returns as expected", {
   x <- c("foo", "bar", "baz", "potato")

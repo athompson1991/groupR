@@ -1,5 +1,7 @@
 context("Time series")
 
+# Set up
+
 bad_names <- c("company a", "company b", "company c")
 
 time_groupr <- groupr(
@@ -13,6 +15,8 @@ extracted_groupr <- extract_xts(
   value_choice = "avg_budget",
   date_col = "dates"
 )
+
+# Tests
 
 test_that("get_groups returns correct names", {
   expect_identical(
