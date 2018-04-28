@@ -1,6 +1,8 @@
 context("Time series")
 
-# Set up
+##########
+# Set up #
+##########
 
 bad_names <- c("company a", "company b", "company c")
 
@@ -16,13 +18,32 @@ extracted_groupr <- extract_xts(
   date_col = "dates"
 )
 
-# Tests
+intervals = rep(c("day", "week", "month"), 2)
+cycles = rep(c("annual", "week"), each = 3)
+start_values <- rep(c(2016.000, 1), each = 3)
+end_values <- c(2016.273, 2017.89733, 2024.25, 15.143, NA, NA)
+frequencies <- c(365.25, 52.17857, 12.00, 7.00, NA, NA)
+
+test_df <- data.frame(
+  stringsAsFactors = F,
+  intervals,
+  cycles,
+  start_values,
+  end_values,
+  frequencies
+)
+
+set.seed(1000)
+end_dates <- as.Date(c("2017-01-06", "2017-02-05", "2017-06-01"))
+intervals <- c("day", "week", "month")
+start <- as.Date("2017-01-01")
+
+#########
+# Tests #
+#########
 
 test_that("get_groups returns correct names", {
-  expect_identical(
-    get_groups(extracted_groupr),
-    c("companies", "states", "department")
-  )
+  expect_identical(get_groups(extracted_groupr), c("companies", "states", "department"))
 })
 
 test_that("fill_xts works as expected", {
@@ -51,23 +72,16 @@ test_that("fill_xts works as expected", {
 })
 
 test_that("extract_xts gives right group level names", {
-  expect_identical(
-    names(extracted_groupr),
-    c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta")
-  )
+  group_names <- c("n_0_group", "n_1_group", "n_2_group", "n_3_group", "meta")
+  n1 <- c("companies", "states", "department")
+  n2 <- c("companies...states", "companies...department", "states...department")
+  n3 <- c("companies...states...department")
+
+  expect_identical(names(extracted_groupr), group_names)
   expect_identical(names(extracted_groupr$n_0_group), "overall")
-  expect_identical(names(extracted_groupr$n_1_group),
-                   c("companies", "states", "department"))
-  expect_identical(
-    names(extracted_groupr$n_2_group),
-    c(
-      "companies...states",
-      "companies...department",
-      "states...department"
-    )
-  )
-  expect_identical(names(extracted_groupr$n_3_group),
-                   c("companies...states...department"))
+  expect_identical(names(extracted_groupr$n_1_group), n1)
+  expect_identical(names(extracted_groupr$n_2_group), n2)
+  expect_identical(names(extracted_groupr$n_3_group), n3)
 })
 
 test_that("extract_xts gives right classes", {
@@ -80,34 +94,19 @@ test_that("extract_xts gives right classes", {
 
 
 test_that("extract_xts gives right xts names", {
-    expect_identical(colnames(extracted_groupr$n_0_group), "overall")
-    expect_identical(
-      colnames(extracted_groupr$n_1_group$companies),
-      c("company_a", "company_b", "company_c")
-    )
-    expect_identical(colnames(extracted_groupr$n_1_group$states), c("wa", "ca"))
-    expect_identical(colnames(extracted_groupr$n_1_group$department),
-                     c("sales", "marketing"))
-    expect_identical(
-      colnames(extracted_groupr$n_2_group$companies...states),
-      c(
-        "company_a/wa",
-        "company_a/ca",
-        "company_b/wa",
-        "company_b/ca",
-        "company_c/wa",
-        "company_c/ca"
-      )
-    )
-  })
+  companies <- c("company_a", "company_b", "company_c")
+  states <- c("wa", "ca")
+  depts <- c("sales", "marketing")
+  combs <- c("company_a/wa","company_a/ca","company_b/wa", "company_b/ca", "company_c/wa","company_c/ca")
+
+  expect_identical(colnames(extracted_groupr$n_0_group), "overall")
+  expect_identical(colnames(extracted_groupr$n_1_group$companies), companies)
+  expect_identical(colnames(extracted_groupr$n_1_group$states), states)
+  expect_identical(colnames(extracted_groupr$n_1_group$department), depts)
+  expect_identical(colnames(extracted_groupr$n_2_group$companies...states), combs)
+})
 
 test_that("fill_xts works for day, week, month", {
-  # Set up
-  set.seed(1000)
-  end_dates <- as.Date(c("2017-01-06", "2017-02-05", "2017-06-01"))
-  intervals <- c("day", "week", "month")
-  start <- as.Date("2017-01-01")
-
   for(i in 1:3){
     int = intervals[i]
     end <- end_dates[i]
@@ -125,21 +124,6 @@ test_that("fill_xts works for day, week, month", {
 })
 
 test_that("make_ts produces as expected", {
-
-  intervals = rep(c("day", "week", "month"), 2)
-  cycles = rep(c("annual", "week"), each = 3)
-  start_values <- rep(c(2016.000, 1), each = 3)
-  end_values <- c(2016.273, 2017.89733, 2024.25, 15.143, NA, NA)
-  frequencies <- c(365.25, 52.17857, 12.00, 7.00, NA, NA)
-
-  test_df <- data.frame(
-    stringsAsFactors = F,
-    intervals,
-    cycles,
-    start_values,
-    end_values,
-    frequencies
-  )
 
   # Annual Tests
 
