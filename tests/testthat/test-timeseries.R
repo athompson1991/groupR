@@ -106,23 +106,6 @@ test_that("extract_xts gives right xts names", {
   expect_identical(colnames(extracted_groupr$n_2_group$companies...states), combs)
 })
 
-test_that("fill_xts works for day, week, month", {
-  for(i in 1:3){
-    int = intervals[i]
-    end <- end_dates[i]
-    dates <- seq.Date(from = start, to = end, by = int)
-    messy1 <- xts::xts(rnorm(5), order.by = dates[-3])
-    messy2 <- xts::xts(runif(5), order.by = dates[-3])
-    merged <- merge(messy1, messy2)
-
-    # Tests
-    expect_equal(zoo::index(fill_xts(messy1, int)), dates, check.attributes = F)
-    expect_equal(zoo::index(fill_xts(merged, int)), dates, check.attributes = F)
-    expect_equal(as.vector(fill_xts(messy1, int))[3], 0)
-    expect_equal(as.vector(fill_xts(messy1, int, fill_val = NA))[3], as.numeric(NA))
-  }
-})
-
 test_that("make_ts produces as expected", {
 
   # Annual Tests
