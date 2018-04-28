@@ -51,9 +51,7 @@ test_that("fill_xts works as expected", {
   start <- as.Date("2017-01-01")
 
   intervals <- c("day", "week", "month", "quarter", "year")
-  end_dates <- as.Date(c(
-    "2017-01-06", "2017-02-06", "2017-06-01", "2018-06-01", "2022-01-01"
-    ))
+  end_dates <- as.Date(c("2017-01-06", "2017-02-06", "2017-06-01", "2018-06-01", "2022-01-01"))
 
   for(i in 1:length(intervals)){
     end_date <- end_dates[i]
@@ -68,6 +66,13 @@ test_that("fill_xts works as expected", {
 
     filled <- fill_xts(messy_xts, interval = interval, fill_val = NA)
     expect_output(filled[[3]], NA)
+
+    multi_mtx <- matrix(rnorm(40), ncol = 8)
+    multi_xts <- xts::xts(multi_mtx, order.by = date_seq[-3])
+    filled_multi <- fill_xts(multi_xts, interval = interval)
+    expect_equal(ncol(filled_multi), 8)
+    expect_equal(nrow(filled_multi), 6)
+    expect_true(all(filled_multi[3, ] == 0))
   }
 })
 

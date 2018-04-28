@@ -30,7 +30,9 @@
 #'   value_choice = "count",
 #'   date_column = "issued_month"
 #' )
-extract_xts <- function(groupr, value_choice, date_column = "dd_dt") {
+extract_xts <- function(
+  groupr, value_choice, date_column = "dd_dt", fill_in_xts = F, interval = "day"
+  ) {
 
   init <- make_init_list(groupr, date_column)
 
@@ -170,11 +172,11 @@ fill_xts <- function(xts_series, interval, fill_val = 0) {
   dt_seq <- seq.Date(
     from = date_range[1], to = date_range[2],
     by = interval)
-  zeros <- xts::xts(rep(0, length(dt_seq)), order.by = dt_seq)
-  merged <- zoo::merge.zoo(zeros, xts_series)
-  out <- merged[, 2]
-  out[is.na(out)] <- fill_val
+  replacement <- xts::xts(rep(0, length(dt_seq)), order.by = dt_seq)
+  merged <- zoo::merge.zoo(replacement, xts_series)
+  out <- merged[, -1]
   out <- xts::as.xts(out)
+  out[is.na(out)] <- fill_val
   return(out)
 }
 
