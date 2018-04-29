@@ -19,7 +19,7 @@ extracted_groupr <- extract_xts(
 )
 
 intervals = rep(c("day", "week", "month"), 2)
-cycles = rep(c("annual", "week"), each = 3)
+cycles = rep(c("year", "week"), each = 3)
 start_values <- rep(c(2016.000, 1), each = 3)
 end_values <- c(2016.273, 2017.89733, 2024.25, 15.143, NA, NA)
 frequencies <- c(365.25, 52.17857, 12.00, 7.00, NA, NA)
@@ -47,11 +47,6 @@ test_that("get_groups returns correct names", {
 })
 
 test_that("fill_xts works as expected", {
-  set.seed(1000)
-  start <- as.Date("2017-01-01")
-
-  intervals <- c("day", "week", "month", "quarter", "year")
-  end_dates <- as.Date(c("2017-01-06", "2017-02-06", "2017-06-01", "2018-06-01", "2022-01-01"))
 
   for(i in 1:length(intervals)){
     end_date <- end_dates[i]
@@ -145,4 +140,13 @@ test_that("make_ts produces as expected", {
   expect_error(make_ts(test_xts, interval = "potato", cycle = "week"), "Bad interval choice")
   expect_error(make_ts(test_xts, interval = "potato", cycle = "year"), "Bad interval choice")
   expect_error(make_ts(test_xts, interval = "week", cycle = "potato"), "Bad cycle choice")
+})
+
+test_that("do_modeling works", {
+  start <- as.Date("2017-01-01")
+  end <- as.Date("2017-01-06")
+  dates <- seq.Date(from = start, to = end, by = "day")
+  daily_xts <- xts::xts(rnorm(6), order.by = dates)
+  model <- do_modeling(daily_xts, interval = "day", cycle = "week")
+  expect_equal(class(model), c("ARIMA", "Arima"))
 })

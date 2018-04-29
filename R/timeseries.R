@@ -119,7 +119,8 @@ rename_xts_list <- function(xts_list, date_column){
 #'
 #' This function allows the user to model all the combinations of \code{xts}
 #' observations extracted using \code{extract_xts}. Because there can be many
-#' columns in an \code{xts_groupr} object, there is the option to do model estimation in parallel.
+#' columns in an \code{xts_groupr} object, there is the option to do model
+#' estimation in parallel.
 #'
 #' @export
 #' @param xts_groupr A \code{groupr} object produced with \code{extract_xts}.
@@ -169,9 +170,7 @@ fill_xts <- function(xts_series, interval, fill_val = 0) {
     stop("Bad interval choice, see details in seq.Date documentation")
 
   date_range <- range(zoo::index(xts_series))
-  dt_seq <- seq.Date(
-    from = date_range[1], to = date_range[2],
-    by = interval)
+  dt_seq <- seq.Date(from = date_range[1], to = date_range[2], by = interval)
   replacement <- xts::xts(rep(0, length(dt_seq)), order.by = dt_seq)
   merged <- zoo::merge.zoo(replacement, xts_series)
   out <- merged[, -1]
