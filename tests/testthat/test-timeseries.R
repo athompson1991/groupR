@@ -149,4 +149,6 @@ test_that("do_modeling works", {
   daily_xts <- xts::xts(rnorm(6), order.by = dates)
   model <- do_modeling(daily_xts, interval = "day", cycle = "week")
   expect_equal(class(model), c("ARIMA", "Arima"))
+  model <- do_modeling(daily_xts, interval = "day", "cycle" = "week")
+  expect_equal(class(model), c("ARIMA", "Arima"))
 })
